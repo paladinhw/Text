@@ -1,0 +1,213 @@
+
+1. adapter를 부르는 부분 찾기
+
+LogCollector.cc 에서
+
+//이것이 repo adapter를 부르는데 
+int LogCollector::executeMessageHandler( int msgId, struct timeval tmval, ContextInfo& context, vector<BasicData>& params )
+{
+	MSGHDLRMAP_I it = m_msgIdHandlerMap.find(msgId);
+	//이 if문은 특이함. 나는 it.second.size() 등으로 해서 진행할 것 같은데 end랑 비교함. 이것이 나을까?
+	if (it != m_msgIdHandlerMap.end()) {
+		vector<RepoAdapter*> vrepo = it->second;
+		for (int ctr = 0; ctr < (int)vrepo.size(); ctr++ ){
+			((RepoAdapter*)vrepo[ctr])->onMessage(msgId, tmval, context, params);
+		}
+	}
+	else {
+		LOGREPO_WARN( logger, "%s : No registered handler for msgId=%d", m_processName.c_str(), msgId );
+	}
+	return 0;
+}
+
+executeMessageHandelr는 아래에서 부름.
+void LogCollector::startRoutine(void)
+
+RepoAdapter.hh .cc
+
+//sok
+//m_msgIdHandlerMap 에 추가하는 방법 암묵적인 추가 방법을 사용하고 있음. 자동생성과 참조 변환을 상요 RAII에 맞는데 새로운 방법이군.
+int LogCollector::registerMessageHandler( int msgId, RepoAdapter *handler )
+{
+	vector<RepoAdapter*> &vrepo = m_msgIdHandlerMap[msgId];
+	vrepo.push_back(handler);
+	return 0;
+}
+
+registerMessageHandler 는 initialize 에서 등록함. 
+
+int LogCollector::initialize( string conf_file )
+{
+	m_runningFlag = false;
+	m_terminateFlag = false;
+	m_latestDCDPTimeVal.tv_sec = 0;
+	m_latestDCDPTimeVal.tv_usec = 0;
+
+	if ( !m_autoRecoveryFlag ) {
+		(void) initRepoAdapterCfgMap(conf_file);
+
+		initMessageIDHandlers();
+
+		// Construct Map of Message Handler
+		for (int repo_ctr = 0; repo_ctr < (int)m_msgIdHandler.size(); ++repo_ctr) {
+			vector<int> vmsgIds = (m_msgIdHandler[repo_ctr])->getMessageIds();
+			for (int msgId_ctr = 0; msgId_ctr < (int)vmsgIds.size();  ++msgId_ctr ) {
+				registerMessageHandler(vmsgIds[msgId_ctr], m_msgIdHandler[repo_ctr]);
+			}
+		}
+
+		m_recoveryTimeDir = MDASCollector::getInstance()->getRecoveryTimeDir();
+		m_delayedMessageThreshold = getEnvVarValueInt(DCDP_DELAYED_MESSAGE_THRESHOLD_ENV_VAR, DCDP_DELAYED_MESSAGE_THRESHOLD_DEFAULT);
+		m_appendedDataTSVDir = MDASCollector::getInstance()->getAppendedDataTSVDir();
+
+
+
+initMessageIDHandlers(); 에서 MSGHDLR  m_msgIdHandler 를 만드는듯. ( MSGHDLR = typedef vector<RepoAdapter*> MSGHDLR;)
+
+
+//RegisterRepoAdapter.cc 에 아래 함수 정의되어 있음. 손수 하나씩 넣는 구만. 파일은 다른데 있지만 Class 는 LogCollector 임. 이렇게 한 이유는?
+
+void LogCollector::initMessageIDHandlers( void )
+{
+	// Start of Message Handlers
+#ifndef MDAS_UT_REPO
+	m_msgIdHandler.push_back((RepoAdapter*)new AAOffsetDataRepoAdapter(getRepoAdaterCfg(std::string(AAOffsetDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new AcqFileCreateEndEventRepoAdapter(getRepoAdaterCfg(std::string(AcqFileCreateEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new AGAMeasureShotDataRepoAdapter(getRepoAdaterCfg(std::string(AGAMeasureShotDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new AGAOffsetGroupDataRepoAdapter(getRepoAdaterCfg(std::string(AGAOffsetGroupDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ALDCMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(ALDCMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new AlfcMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(AlfcMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ALFCMeasureEventRepoAdapter(getRepoAdaterCfg(std::string(ALFCMeasureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new AmountOfWaferCountBySHRHDataRepoAdapter(getRepoAdaterCfg(std::string(AmountOfWaferCountBySHRHDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new BaroAndWltDataRepoAdapter(getRepoAdaterCfg(std::string(BaroAndWltDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new BlcMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(BlcMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new BLCMeasureEventRepoAdapter(getRepoAdaterCfg(std::string(BLCMeasureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ChamberEventRepoAdapter(getRepoAdaterCfg(std::string(ChamberEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ChamberStatusDataRepoAdapter(getRepoAdaterCfg(std::string(ChamberStatusDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ChamberStatusPurgeDataRepoAdapter(getRepoAdaterCfg(std::string(ChamberStatusPurgeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new CommandEventRepoAdapter(getRepoAdaterCfg(std::string(CommandEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new CommunicationStateChangeEventRepoAdapter(getRepoAdaterCfg(std::string(CommunicationStateChangeEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ControlStateChangeEventRepoAdapter(getRepoAdaterCfg(std::string(ControlStateChangeEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new EAGATimeDataRepoAdapter(getRepoAdaterCfg(std::string(EAGATimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new EPCPowerEndEventRepoAdapter(getRepoAdaterCfg(std::string(EPCPowerEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new EPCPowerStartEventRepoAdapter(getRepoAdaterCfg(std::string(EPCPowerStartEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ErrorEventRepoAdapter(getRepoAdaterCfg(std::string(ErrorEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ExposureDataRepoAdapter(getRepoAdaterCfg(std::string(ExposureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ExposureExecuteDataRepoAdapter(getRepoAdaterCfg(std::string(ExposureExecuteDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ExposureResultDataRepoAdapter(getRepoAdaterCfg(std::string(ExposureResultDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ExposureShotDataRepoAdapter(getRepoAdaterCfg(std::string(ExposureShotDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ExposureTimeDataRepoAdapter(getRepoAdaterCfg(std::string(ExposureTimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FGAExcludeShotDataRepoAdapter(getRepoAdaterCfg(std::string(FGAExcludeShotDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FGAMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(FGAMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FlareDataRepoAdapter(getRepoAdaterCfg(std::string(FlareDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FLAREMeasurementDataRepoAdapter(getRepoAdaterCfg(std::string(FLAREMeasurementDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FraDataRepoAdapter(getRepoAdaterCfg(std::string(FraDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FRATimeDataRepoAdapter(getRepoAdaterCfg(std::string(FRATimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FrocMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(FrocMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FROCMeasureEventRepoAdapter(getRepoAdaterCfg(std::string(FROCMeasureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new GTOCDataRepoAdapter(getRepoAdaterCfg(std::string(GTOCDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new GTOCMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(GTOCMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ImpulseFFDataRepoAdapter(getRepoAdaterCfg(std::string(ImpulseFFDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new InlineInTimeDataRepoAdapter(getRepoAdaterCfg(std::string(InlineInTimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new InlineOutTimeDataRepoAdapter(getRepoAdaterCfg(std::string(InlineOutTimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new IucDataRepoAdapter(getRepoAdaterCfg(std::string(IucDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LimcDataRepoAdapter(getRepoAdaterCfg(std::string(LimcDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LoadDataRepoAdapter(getRepoAdaterCfg(std::string(LoadDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LotContextEventRepoAdapter(getRepoAdaterCfg(std::string(LotContextEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LotEventRepoAdapter(getRepoAdaterCfg(std::string(LotEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LotResultDataRepoAdapter(getRepoAdaterCfg(std::string(LotResultDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LotSettingDataRepoAdapter(getRepoAdaterCfg(std::string(LotSettingDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MAEndEventRepoAdapter(getRepoAdaterCfg(std::string(MAEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MainAGADataRepoAdapter(getRepoAdaterCfg(std::string(MainAGADataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MainAGAHighOASDataRepoAdapter(getRepoAdaterCfg(std::string(MainAGAHighOASDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MainAGAMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(MainAGAMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MainAGAMeasureEventRepoAdapter(getRepoAdaterCfg(std::string(MainAGAMeasureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MainAGAMeasureMarkDataRepoAdapter(getRepoAdaterCfg(std::string(MainAGAMeasureMarkDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MainPowerEventRepoAdapter(getRepoAdaterCfg(std::string(MainPowerEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MAStartEventRepoAdapter(getRepoAdaterCfg(std::string(MAStartEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new PanelConEventRepoAdapter(getRepoAdaterCfg(std::string(PanelConEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ParameterEditEventRepoAdapter(getRepoAdaterCfg(std::string(ParameterEditEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new PatchResultDataRepoAdapter(getRepoAdaterCfg(std::string(PatchResultDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new PatchSeqRepoAdapter(getRepoAdaterCfg(std::string(PatchSeqRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new PatchSettingDataRepoAdapter(getRepoAdaterCfg(std::string(PatchSettingDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new PATimeDataRepoAdapter(getRepoAdaterCfg(std::string(PATimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new PressureEventRepoAdapter(getRepoAdaterCfg(std::string(PressureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ProcessStateChangeEventRepoAdapter(getRepoAdaterCfg(std::string(ProcessStateChangeEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ResetEndEventRepoAdapter(getRepoAdaterCfg(std::string(ResetEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ResetStartEventRepoAdapter(getRepoAdaterCfg(std::string(ResetStartEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ReticleContextEventRepoAdapter(getRepoAdaterCfg(std::string(ReticleContextEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new REXDataRepoAdapter(getRepoAdaterCfg(std::string(REXDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new RSAMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(RSAMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new RSAMeasureMarkDataRepoAdapter(getRepoAdaterCfg(std::string(RSAMeasureMarkDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new RSRCEndEventRepoAdapter(getRepoAdaterCfg(std::string(RSRCEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new RSRCStartEventRepoAdapter(getRepoAdaterCfg(std::string(RSRCStartEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new RSWFEndEventRepoAdapter(getRepoAdaterCfg(std::string(RSWFEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new RSWFStartEventRepoAdapter(getRepoAdaterCfg(std::string(RSWFStartEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SCHTimeDataRepoAdapter(getRepoAdaterCfg(std::string(SCHTimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ShotFocusResultDataRepoAdapter(getRepoAdaterCfg(std::string(ShotFocusResultDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ShotResultDataRepoAdapter(getRepoAdaterCfg(std::string(ShotResultDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ShotSettingDataRepoAdapter(getRepoAdaterCfg(std::string(ShotSettingDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SHTimeDataRepoAdapter(getRepoAdaterCfg(std::string(SHTimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new StartWaferInDataRepoAdapter(getRepoAdaterCfg(std::string(StartWaferInDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SubAGAMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(SubAGAMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SubAGAMeasureMarkDataRepoAdapter(getRepoAdaterCfg(std::string(SubAGAMeasureMarkDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SystemParameterEditDataRepoAdapter(getRepoAdaterCfg(std::string(SystemParameterEditDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SystemParameterResetDataRepoAdapter(getRepoAdaterCfg(std::string(SystemParameterResetDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new SystemParameterResetStartDataRepoAdapter(getRepoAdaterCfg(std::string(SystemParameterResetStartDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TemperatureEventRepoAdapter(getRepoAdaterCfg(std::string(TemperatureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ToolPowerEventRepoAdapter(getRepoAdaterCfg(std::string(ToolPowerEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ToolVersionEventRepoAdapter(getRepoAdaterCfg(std::string(ToolVersionEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TPOCMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(TPOCMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TPOCMeasureEventRepoAdapter(getRepoAdaterCfg(std::string(TPOCMeasureEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TrueCauseErrorEventRepoAdapter(getRepoAdaterCfg(std::string(TrueCauseErrorEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TVPADataRepoAdapter(getRepoAdaterCfg(std::string(TVPADataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TVPAMeasureDataRepoAdapter(getRepoAdaterCfg(std::string(TVPAMeasureDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new TVPAMeasureMarkDataRepoAdapter(getRepoAdaterCfg(std::string(TVPAMeasureMarkDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new UnloadDataRepoAdapter(getRepoAdaterCfg(std::string(UnloadDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WaferContextEventRepoAdapter(getRepoAdaterCfg(std::string(WaferContextEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WaferResultDataRepoAdapter(getRepoAdaterCfg(std::string(WaferResultDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WaferStageTimeDataRepoAdapter(getRepoAdaterCfg(std::string(WaferStageTimeDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WaitingforWaferfromCDDataRepoAdapter(getRepoAdaterCfg(std::string(WaitingforWaferfromCDDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WaitingforWafertoCDDataRepoAdapter(getRepoAdaterCfg(std::string(WaitingforWafertoCDDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WIAFDataRepoAdapter(getRepoAdaterCfg(std::string(WIAFDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WIAFMeasureMarkDataRepoAdapter(getRepoAdaterCfg(std::string(WIAFMeasureMarkDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MAStopEndEventRepoAdapter(getRepoAdaterCfg(std::string(MAStopEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MAStopErrorEventRepoAdapter(getRepoAdaterCfg(std::string(MAStopErrorEventRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new MAStopSeqRepoAdapter(getRepoAdaterCfg(std::string(MAStopSeqRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new FLAREMeasurementModeLoopDataRepoAdapter(getRepoAdaterCfg(std::string(FLAREMeasurementModeLoopDataRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new ParameterHistoryOnRepoAdapter(getRepoAdaterCfg(std::string(ParameterHistoryOnRepoAdapter::REPO_ADAPTER_NAME))));
+#else
+	m_msgIdHandler.push_back((RepoAdapter*)new GausDataRepoAdapter());
+	m_msgIdHandler.push_back((RepoAdapter*)new FlareDataRepoAdapter());
+	m_msgIdHandler.push_back((RepoAdapter*)new IucDataRepoAdapter());
+	m_msgIdHandler.push_back((RepoAdapter*)new LimcDataRepoAdapter());
+	m_msgIdHandler.push_back((RepoAdapter*)new SapmDataRepoAdapter());
+#endif
+	m_msgIdHandler.push_back((RepoAdapter*)new ShotSeqRepoAdapter(getRepoAdaterCfg(std::string(ShotSeqRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new WaferSeqRepoAdapter(getRepoAdaterCfg(std::string(WaferSeqRepoAdapter::REPO_ADAPTER_NAME))));
+	m_msgIdHandler.push_back((RepoAdapter*)new LotSeqRepoAdapter(getRepoAdaterCfg(std::string(LotSeqRepoAdapter::REPO_ADAPTER_NAME))));
+	// End of Message Handlers
+
+	return;
+}
+
+//각 RepoAdapter 는 아래와 같이 정의 되어 있음.
+
+
+class  AAOffsetDataRepoAdapter : public RepoAdapter {
+public:
+	/** Adapter Name */
+	...
+	
+	onMessage 는 아래와 같음. 여기서 F_AAOffsetData_Common 는 repo 마다 있는 것 같은데 singleton 패턴임. 
+
+int AAOffsetDataRepoAdapter::onMessage( int msgId, struct timeval tmval, ContextInfo& context, vector<BasicData>& params )
+{
+	F_AAOffsetData_Common& f = F_AAOffsetData_Common::GetFactory();
+	AAOffsetData objAAOffsetData;
+	int objectId;
+	
+
+F_AAOffsetData_Common 은 DB interface 인듯. repository 인가? 알아야 됨. 왜 모든 repo 에 만들었는지?
+	
+우선 여기까지 함.

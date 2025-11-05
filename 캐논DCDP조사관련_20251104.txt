@@ -1,0 +1,280 @@
+
+DCdpconnector.cc 에서 아래 함수로 메시지 얻는듯.
+
+int DcdpConnector::getLogFromDcdp( DcdpLogType &logType, void *logData )
+{
+	int ret = 0;
+	// DCDPへ渡す変数の準備
+	unsigned char buffer[DCDP_LOGLENMAX]; // DCDPメッセージ受信バッファ
+	DcdpMsg *dcdpMsg = (DcdpMsg*)buffer;
+
+	int sd = getConnectionID();
+
+	if (logData == NULL) {
+		LOGREPO_ERROR(logger, "%s : DcdpRecvMsg() returns empty log data", m_dcdpSessionName.c_str());
+		return -1;
+	}
+
+	if (isConnectedToDcdp()) {
+
+		ret = DcdpRecvMsg(sd, dcdpMsg);
+
+...		
+	
+dcdp.h 기기마다 있는듯.
+
+/*** DCDP メッセージボディー ***/
+typedef union {
+	EqEvent eqev;
+	EqDeficit eqdef;
+	DcdpCmdResult cmdres;
+	EqVersionInfo verinfo;
+	DcdpNotify notify;
+	DcdpL1Message l1msg;
+} DcdpMsgBody;
+
+	/*** DCDP メッセージ ***/
+typedef struct {
+	int type;		/* DcdpMsgType 参照 */
+	int bodySize;
+	unsigned serialNo;
+	DcdpMsgBody body;
+} DcdpMsg;
+
+/*** DCDP メッセージタイプ ***/
+typedef enum {
+	DMT_Event,			/* 通常イベント           */  //보통 Event
+	DMT_Resend,			/* 再送イベント           */  //재배송Event
+	DMT_L1,				/* DCDP L1 メッセージ     */ //DCDPL1 메시지
+	DMT_L1Resend,		/* DCDP L1 再送メッセージ */ //DCDPL1 재발송 메시지
+	DMT_Deficit,		/* データ欠損情報         */ //데이터결손정보
+	DMT_CmdResult,		/* コマンド実行結果       */  //명령어실행결과
+	DMT_VersionInfo,	/* バージョン情報         */  //버전정보
+	DMT_Notify,			/* 各種通知               */  //각종공지
+	DMT_CmdMsg			/* dcdp が発行するコマンド(dcdp 専用) */  //dcdp가 발행하는 명령어 (dcdp전용)
+} DcdpMsgType;
+
+이런 메시지가 옴.
+
+			DcdpMsg* const dcdpMsg; ///< バッファをDcdpMsgとして解釈
+			
+Dcdpconnector.cc 에서 다음과 같이 분기함.			
+			
+		switch(dcdpMsg->type) {
+		case DMT_Event:
+		case DMT_Resend:	
+
+getLogFromDcdp 는 LogCollecter 의 stratRoutine에서 사용.
+
+void LogCollector::startRoutine(void)		
+	...
+	
+	//아래가 DcDp 에서 얻은 event 처리하는 Main routine 인듯.
+	//이 위에는 while 문으로 계속 돌고 있음. 여기서 JSON 만들면 될듯.  
+	//
+	
+	
+	while (!this->isTerminated()) {
+		...
+	
+			// Filtering of messages by msgId is done by DCDP
+		memset(logData, '\0', DcdpConnector::DCDP_LOGLENMAX);
+		logType = DcdpConnector::DCDP_LOGTYPE_UNKNOWN;
+		err = dcdpConn->getLogFromDcdp(logType, logData);
+		
+		
+				switch (logType) {
+			case DcdpConnector::DCDP_LOGTYPE_L0:
+			{
+				L0Msg* l0Msg = (L0Msg*)logData;
+				int msgId = l0Msg->getMsgId();
+
+				// コンテキストから情報取得
+				ContextInfo context = *(l0Msg->getContext());
+				int jobId = context.jobId;
+				int waferId = context.waferId;
+				int waferInLot = (int)context.waferInLot;
+
+				struct timeval prevTimeVal;
+				prevTimeVal.tv_sec = m_latestDCDPTimeVal.tv_sec;
+				prevTimeVal.tv_usec = m_latestDCDPTimeVal.tv_usec;
+
+				// 発生時刻を取得
+				m_latestDCDPTimeVal.tv_sec = l0Msg->getSec();
+				m_latestDCDPTimeVal.tv_usec = l0Msg->getMicrosec();
+
+				if ( m_autoRecoveryFlag ) {
+				} else {
+					LOGREPO_INFO( logger, "mdas_collector.exe: JobID:%d, waferId:%d, waferInLot:%d, msgid:%d, Event Time sec:%ld, usec:%ld",
+								jobId, waferId, waferInLot, msgId, m_latestDCDPTimeVal.tv_sec, m_latestDCDPTimeVal.tv_usec );
+
+					// Check if delayed message is received
+					getTime(&mdas_current_time);
+					// <-- SST000-02357 MDAS TimeSync
+					mdas_current_time.tv_sec += m_timeDiffSec;
+					// ST000-02357 MDAS TimeSync -->
+					diff = diffTime(&mdas_current_time, &m_latestDCDPTimeVal);
+					if ( diff.tv_sec > m_delayedMessageThreshold ) {
+						LOGREPO_INFO( logger, "%s : Delayed message detected!!! (over %d secs difference)", m_processName.c_str(), m_delayedMessageThreshold );
+						dcdpConn->disconnectFromDcdp();
+						// SST000-01635 Start
+						// Remove incomplete objects from previous DCDP session
+						cleanUp(context.stage);
+						// SST000-01635 End
+						break;
+					}
+				}
+
+				if (l0MsgSpecMap == NULL) {
+					LOGREPO_ERROR( logger, "%s : L0MsgSpecMap is NULL", m_processName.c_str() );
+					break;
+				}
+
+				// Retrieve the parameters
+				vector<BasicData> params;
+				vector<std::string> strParams;
+  		  		vector<char*> convertedStrs;
+				if (extractParameters(l0MsgSpecMap, l0Msg, params, strParams, convertedStrs) != 0) {
+					clearCharVector(convertedStrs);
+					break;
+				}
+				if (l0Msg->validateParams(msgId, l0MsgSpecMap, params) != 0) {
+					LOGREPO_ERROR( logger, "%s : Error reading data for msgid:%d", m_processName.c_str(), msgId );
+					params.clear();
+					strParams.clear();
+					clearCharVector(convertedStrs);
+					break;
+				}
+
+				bLotStartFlag = (msgId == JOB_START_MID) ? true : false;
+
+				if ( m_autoRecoveryFlag ) {
+					if (DcdpAutoRecovery::getInstance()->isRecoveryEnd()) {
+						clearCharVector(convertedStrs);
+						break;
+					}
+					bLotEndFlag = ((msgId == JOB_END_MID) && (strParams[0].compare("EndJob") == 0)) ? true : false;
+					bResetEndFlag = (msgId == RESET_END_MID) ? true : false;
+					//EST-00037 Mod Start: TX-101 ResetEnd　対応
+					if(std::strcmp(machineType, "TX_101" )){
+						bResetEndFlag = ((msgId == RESET_END_MID_TX_101) && 
+						((strParams[0].compare("MainResetSequenceForPm") == 0) || (strParams[0].compare("MainResetSequenceForJm") == 0) || 
+						 (strParams[1].compare("End") == 0) || (strParams[1].compare("End(Error)") == 0))) ? true : false;
+					}else{
+						bResetEndFlag = (msgId == RESET_END_MID) ? true : false;
+					}
+					//EST-00037 Mod End
+
+					if ( bLotStartFlag ) {
+						bLotSeqOpened = true;
+					} else if ( bLotEndFlag ) {
+						bLotSeqOpened = false;
+					}
+
+					struct timeval recoveryStartTime;
+					struct timeval recoveryEndTime;
+					DcdpAutoRecovery::getInstance()->getRetransmissionTime(&recoveryStartTime, &recoveryEndTime);
+
+					diff = diffTime(&m_latestDCDPTimeVal, &recoveryEndTime);
+					if ( diff.tv_sec > 0 || (diff.tv_sec == 0 && diff.tv_usec >= 0) ) {
+						if ( bLotStartFlag || bLotEndFlag || bResetEndFlag ) {
+							if ( !bLotStartFlag ) {
+								saveMessageToTSV(msgId, m_latestDCDPTimeVal, context, strParams);
+								if (dcdpConn->hasAppendedData()) {
+									saveMessageToTSV(msgId, m_latestDCDPTimeVal, context, strParams, true);
+								}
+							}
+							LOGREPO_INFO( logger, "%s : Received End message after recovery end time.", m_processName.c_str() );
+							finalizeTSVFile();
+							if (dcdpConn->hasAppendedData()) {
+								finalizeTSVFile(true);
+							}
+							DcdpAutoRecovery::getInstance()->notifyRecoveryEnd();
+							clearCharVector(convertedStrs);
+							break;
+						}
+						if ( !bLotSeqOpened ) {
+							LOGREPO_INFO( logger, "%s : No opened LotSeq object before recovery end time.", m_processName.c_str() );
+							finalizeTSVFile();
+							if (dcdpConn->hasAppendedData()) {
+								finalizeTSVFile(true);
+							}
+							DcdpAutoRecovery::getInstance()->notifyRecoveryEnd();
+							clearCharVector(convertedStrs);
+							break;
+						}
+						if (diff.tv_sec > m_recoveryEndMessageThreshold ) {
+							LOGREPO_INFO( logger, "%s : Reached maximum recovery end time threshold:%d sec", m_processName.c_str(), m_recoveryEndMessageThreshold );
+							finalizeTSVFile();
+							if (dcdpConn->hasAppendedData()) {
+								finalizeTSVFile(true);
+							}
+							DcdpAutoRecovery::getInstance()->notifyRecoveryEnd();
+							clearCharVector(convertedStrs);
+							break;
+						}
+					}
+
+					if ( m_currentRecoveryTSVFile.length() == 0 ) {
+						m_currentRecoveryTSVFile = createTSVFile(recoveryStartTime, recoveryEndTime);
+					}
+
+					if ( dcdpConn->hasAppendedData() && m_currentRecoveryTSVFileAppended.length() == 0 ) {
+						m_currentRecoveryTSVFileAppended = createTSVFile(recoveryStartTime, recoveryEndTime, true);
+					}
+
+					//SST000-02425 add divide condition(ResetEnd)
+					if ( !bLotEndFlag && !bResetEndFlag && (m_autoRecoveryTSVStatus != TSV_STATUS_EMPTY) ) {
+						divideTSV(msgId, context.jobId, strParams, prevTimeVal, bLotStartFlag, bLotEndFlag, bResetEndFlag);
+					}
+
+					saveMessageToTSV(msgId, m_latestDCDPTimeVal, context, strParams);
+					if (dcdpConn->hasAppendedData()) {
+						saveMessageToTSV(msgId, m_latestDCDPTimeVal, context, strParams, true);
+					}
+
+					if ( bLotEndFlag || bResetEndFlag ) { //SST000-02425 add divide condition(ResetEnd)
+						divideTSV(msgId, context.jobId, strParams, prevTimeVal, bLotStartFlag, bLotEndFlag, bResetEndFlag);
+					}
+
+				} else {
+					if ( !bFirstDCDPMessageFlag && MDASCollector::getInstance()->isDCDPAutoRecoveryEnabled()) {
+						saveRecoveryEndTime();
+						bFirstDCDPMessageFlag = true;
+					}
+
+					// Execute handler for msgId
+					if (executeMessageHandler(msgId, m_latestDCDPTimeVal, context, params) != 0) {
+						LOGREPO_WARN( logger, "%s : Error executing message handler for msgId=[%d]", m_processName.c_str(), msgId );
+					}
+
+					if (dcdpConn->hasAppendedData()) {
+						// Save appended data to TSV
+						saveMessageToTSV(msgId, m_latestDCDPTimeVal, context, strParams, true);
+					}
+				}
+
+				params.clear();
+				strParams.clear();
+				clearCharVector(convertedStrs);
+			} break;
+			case DcdpConnector::DCDP_LOGTYPE_VERSION:
+			{
+				if (strcmp(brtlVersion.c_str(), dcdpConn->getL0MsgSpecMap()->getBrtlVersion().c_str()) == 0) {
+					break;
+				}
+				if ( m_autoRecoveryFlag ) {
+					// Ignored by Recovery process
+					break;
+				}
+				struct timeval endTime = {0, 0};
+				dcdpConn->setRetransmissionTime(m_latestDCDPTimeVal, endTime);
+				dcdpConn->setRetransmissionMode(DcdpConnector::DCDP_RESEND_MODE_3);
+				// Restart Log request after the last message
+				dcdpConn->stopLogRequest();
+				dcdpConn->disconnectFromDcdp();
+				bVersionInfoMsgFlag = true;
+			} break;
+			default:
+				break;
+		} // end switch(logType)
