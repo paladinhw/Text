@@ -1,0 +1,102 @@
+각 Event 의 연결
+
+Event 에 대해 알아봄. 
+현재 Event가 발생하면 DB에 넣는것 같은데 stacic map 인지 어디 tcp인지 불분명 좀더 알아봐야 함.
+
+6300a 에 있음. TX101에는 없음.
+AAOffsetData (IF_AAOffsetData.hpp 안에)
+AAOffsetDataRepoAdapter (mdas_collector/RepoAdapter) <- RepoAdapter.hh(/mdas_collector/)
+
+IF_AAOffsetData (hpp, MachineModel/
+
+
+Log Message
+StartWaferInData
+WACStatusLocationDAta
+
+TMValMatDataRepoAdapter
+
+//
+
+TMValmatData (IF에 있음. BaseEventData상속.)
+IF_TMValMatData (hpp, TMValmatData(, F_TMValmatData_VCS(baseinterface), BCS, )
+
+F_TMValmatData_VCS (dbinsert, dbtransfer...)
+~_BCS
+   static MdasInsertQueue& m_mdas_insert_queue_; 정체는?
+   
+   VCS, BCS 같은 것을 사용.
+       static std::vector<TMValmatData> C_Instance_;
+    static std::vector<boost::shared_ptr <TMValmatData> > C_latestObject_;
+    static MdasInsertQueue& m_mdas_insert_queue_;
+    static pthread_mutex_t m_func_;
+	
+DB_TMValmatData (hpp, MachineModel/TX_101/CppCode/Repository/inc)
+-> DB_Insert_TMValmatData 는 Uni_TMValmatData.cpp 에 연결됨.
+
+//이 DB_Insert 와 아래  DB_Insert_TMValmatData 는 무슨 관계일까. 
+int DB_TMValmatData::DB_Insert(S_Insert_TMValmatData_In& in)
+{
+    pthread_mutex_lock(&m_mutex);
+    int stationNo = GetStationNumber((char*)in.portName);
+
+    for (int i = 0; i < in.objSize; i++) {
+        m_cont[in.container[i].ID_TMValmatData_] = in.container[i];
+        LOGREPO_INFO(logger, "StationNo[%d] %s Insert ObjId = %d", stationNo, __FUNCTION__, in.container[i].ID_TMValmatData_);
+    }
+    pthread_mutex_unlock(&m_mutex);
+
+    return 0;
+}
+
+
+Uni_TMValmatData (cpp, /MachineModel/TX_101/CppCode/Repository/app/tcp_client)
+
+//아래 코드에서 ESPRIT_SERVER_IPADDR 궁금.
+int DB_Insert_TMValmatData(S_Insert_TMValmatData_In& in)
+{
+    int rtn = 0;
+    char out[1];
+    setInsertPortInfo((char*)in.portName);
+    F_ClientTcpIo  factory;
+    I_ClientTcpIo* instance = factory.createInstance(&tcpInsertInfo, ID_FUNC_END, (char *)ESPRIT_SERVER_IPADDR, (char *)in.portName, tcpInsertInfo.connect);
+
+    try {
+        instance->exec(ID_Insert_TMValmatData, (char*)&in, sizeof(in), DB_DEFAULT_TIMEOUT);
+        instance->waitE(ID_Insert_TMValmatData, (char*)out, sizeof(*out), DB_DEFAULT_TIMEOUT);
+    } catch (int error) {
+        rtn = error;
+    } catch (...) {
+        rtn = ERR_TCPIO_SYSTEM;
+    }
+    return rtn;
+}
+
+
+
+//Esprit 분석
+1. Makefile (먼저 Make)
+
+include ../Makefile.in
+
+MEM_PROG = ../../Repository/bin/esprit_repo_mem
+INC = -I. -I../inc -I../../tcp_server/inc -I../../Repository/inc -I$(LOGINC)
+MEMLIBS = -L../lib -L../../Repository/lib \
+	-lserv_tcpio -ltcp_common_server -lRepoStorageMem -lrepoutil -lpthread -lrt
+build:
+	@echo "Compiling Repository Binary (Mem)"
+	$(GCC) $(CFLAGS) $(INC) $(GCOV) -o $(MEM_PROG) $(SRCS) $(MEMLIBS) $(LOGLIB)
+	@echo "Create $(MEM_PROG)"
+
+clean:
+	@rm -rf *.o *~
+
+LOGINC => CppCode/Common/inc  인듯.
+CFLAGS = -wall (가끔 -g -DDEBUG 있음) - (CFLAGS = -D_POSIX_SOURCE -D_XOPEN_SOURCE_EXTENDED -DDEBUG (mdas_adapter/Common/libmdasif/tcp_client/Makefile 에 또다른 정의있음)
+GCOV = -coverage
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+SRC_DIR = .
+LOGLIB = -L$(LOGLIB_BASE)/64bit -llog4cpp
+LOGLIB_BASE = $(ROOTDIR)/CppCode/Common/lib
+
+

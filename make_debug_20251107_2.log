@@ -1,0 +1,1471 @@
+echo "Repository build for 64bit"
+make module BITS=64
+for f in ../MachineModel/5550iZ2/ ../MachineModel/6300ES6a/ ../MachineModel/TX_101/; \
+	do \
+		d=`basename ${f}`; \
+		mv ../MachineModel/${d}/CppCode/Repository/lib/py_repo_tcp.so ../MachineModel/${d}/CppCode/Repository/lib/py_repo_tcp_64bit.so;\
+	done
+mv Repository/app/RepoMain/esprit_repo_mem Repository/app/RepoMain/esprit_repo_mem_64bit; 
+cd mdas_adapter; make -s build
+cd mdas_reque; make -s build
+# GNU Make 4.3
+# このプログラムは x86_64-redhat-linux-gnu 用にビルドされました
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# ライセンス GPLv3+: GNU GPL バージョン 3 以降 <http://gnu.org/licenses/gpl.html>
+# これはフリーソフトウェアです: 自由に変更および配布できます.
+# 法律の許す限り、　無保証　です.
+
+# Make データベース出力 Fri Nov  7 16:05:25 2025
+
+# 変数
+
+# 環境変数
+SSH_TTY = /dev/pts/10
+# デフォルト
+PREPROCESS.S = $(CC) -E $(CPPFLAGS)
+# 環境変数
+JAVA_HOME = /usr/lib/jvm/java-11-openjdk
+# デフォルト
+COMPILE.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# デフォルト
+ARFLAGS = rv
+# デフォルト
+AS = as
+# デフォルト
+AR = ar
+# デフォルト
+OBJC = cc
+# 環境変数
+define BASH_FUNC_scl%%
+() {  if [ "$1" = "load" -o "$1" = "unload" ]; then
+ eval "module $@";
+ else
+ /usr/bin/scl "$@";
+ fi
+}
+endef
+# デフォルト
+LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# デフォルト
+LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# 環境変数
+NVM_DIR = /root/.nvm
+# 環境変数
+MODULES_CMD = /usr/share/Modules/libexec/modulecmd.tcl
+# デフォルト
+MAKE_COMMAND := make
+# 環境変数
+define BASH_FUNC_which%%
+() {  ( alias;
+ eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+}
+endef
+# 自動変数
+@D = $(patsubst %/,%,$(dir $@))
+# デフォルト
+COFLAGS = 
+# デフォルト
+COMPILE.mod = $(M2C) $(M2FLAGS) $(MODFLAGS) $(TARGET_ARCH)
+# デフォルト
+.VARIABLES := 
+# 環境変数
+PWD = /home/ifour/make_mdas_build_1/output/dev/CppCode
+# 自動変数
+%D = $(patsubst %/,%,$(dir $%))
+# 環境変数
+HOSTNAME = localhost
+# 環境変数
+MAIL = /var/spool/mail/root
+# 環境変数
+XDG_DATA_DIRS = /root/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
+# デフォルト
+LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
+# 環境変数
+OLDPWD = /home/ifour/make_mdas_build_1/output/dev
+# デフォルト
+TEXI2DVI = texi2dvi
+# 環境変数
+MODULES_RUN_QUARANTINE = LD_LIBRARY_PATH LD_PRELOAD
+# 自動変数
+^D = $(patsubst %/,%,$(dir $^))
+# 自動変数
+%F = $(notdir $%)
+# 環境変数
+NVM_INC = /root/.nvm/versions/node/v16.15.1/include/node
+# デフォルト
+LEX.l = $(LEX) $(LFLAGS) -t
+# 環境変数
+LANG = ja_JP.UTF-8
+# 環境変数
+GUESTFISH_OUTPUT = \e[0m
+# デフォルト
+.LOADED := 
+# デフォルト
+.INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
+# デフォルト
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# 環境変数
+GUESTFISH_INIT = \e[1;34m
+# makefile 変数
+MAKEFLAGS = np
+# デフォルト
+LINK.f = $(FC) $(FFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# デフォルト
+TANGLE = tangle
+# makefile 変数
+CURDIR := /home/ifour/make_mdas_build_1/output/dev/CppCode
+# デフォルト
+PREPROCESS.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -F
+# 環境変数
+define BASH_FUNC_module%%
+() {  local _mlredir=1;
+ if [ -n "${MODULES_REDIRECT_OUTPUT+x}" ]; then
+ if [ "$MODULES_REDIRECT_OUTPUT" = '0' ]; then
+ _mlredir=0;
+ else
+ if [ "$MODULES_REDIRECT_OUTPUT" = '1' ]; then
+ _mlredir=1;
+ fi;
+ fi;
+ fi;
+ case " $@ " in 
+ *' --no-redirect '*)
+ _mlredir=0
+ ;;
+ *' --redirect '*)
+ _mlredir=1
+ ;;
+ esac;
+ if [ $_mlredir -eq 0 ]; then
+ _module_raw "$@";
+ else
+ _module_raw "$@" 2>&1;
+ fi
+}
+endef
+# 環境変数
+LESSOPEN = ||/usr/bin/lesspipe.sh %s
+# 自動変数
+*D = $(patsubst %/,%,$(dir $*))
+# 環境変数
+MFLAGS = -np
+# デフォルト
+COMPILE.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# デフォルト
+.SHELLFLAGS := -c
+# デフォルト
+M2C = m2c
+# 環境変数
+NVM_BIN = /root/.nvm/versions/node/v16.15.1/bin
+# デフォルト
+COMPILE.cpp = $(COMPILE.cc)
+# デフォルト
+TEX = tex
+# 環境変数
+HISTSIZE = 1000
+# 自動変数
++D = $(patsubst %/,%,$(dir $+))
+# makefile 変数 (ファイル 'Makefile', 1 行目)
+MAKEFILE_LIST := Makefile
+# デフォルト
+F77FLAGS = $(FFLAGS)
+# 自動変数
+@F = $(notdir $@)
+# 環境変数
+path = /root/.nvm/versions/node/v16.15.1/bin:/root/.local/bin:/root/bin:/usr/share/Modules/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/usr/bin/expect
+# 環境変数
+XDG_SESSION_TYPE = tty
+# 自動変数
+?D = $(patsubst %/,%,$(dir $?))
+# デフォルト
+COMPILE.def = $(M2C) $(M2FLAGS) $(DEFFLAGS) $(TARGET_ARCH)
+# デフォルト
+CTANGLE = ctangle
+# 自動変数
+*F = $(notdir $*)
+# 環境変数
+MODULEPATH = /etc/scl/modulefiles:/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/share/modulefiles
+# 環境変数
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/0/bus
+# 自動変数
+<D = $(patsubst %/,%,$(dir $<))
+# デフォルト
+COMPILE.C = $(COMPILE.cc)
+# 環境変数
+__MODULES_LMINIT = module use --append /usr/share/Modules/modulefiles:module use --append /etc/modulefiles:module use --append /usr/share/modulefiles
+# デフォルト
+YACC.m = $(YACC) $(YFLAGS)
+# 環境変数
+define BASH_FUNC_ml%%
+() {  module ml "$@"
+}
+endef
+# デフォルト
+LINK.C = $(LINK.cc)
+# デフォルト
+MAKE_HOST := x86_64-redhat-linux-gnu
+# デフォルト
+LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# makefile 変数
+SHELL = /bin/sh
+# デフォルト
+MAKECMDGOALS := build
+# デフォルト
+LINK.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# 環境変数
+SHLVL = 1
+# 環境変数
+MAKELEVEL := 0
+# デフォルト
+MAKE = $(MAKE_COMMAND)
+# デフォルト
+FC = f77
+# 環境変数
+PATH = /root/.nvm/versions/node/v16.15.1/bin:/root/.local/bin:/root/bin:/usr/share/Modules/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+# デフォルト
+LINT = lint
+# デフォルト
+PC = pc
+# デフォルト
+MAKEFILES := 
+# 環境変数
+MODULESHOME = /usr/share/Modules
+# 環境変数
+MOTD_SHOWN = pam
+# 自動変数
+^F = $(notdir $^)
+# makefile 変数 (ファイル 'Makefile', 4 行目)
+installTarget_mdascollector64 = install_mdascollector64
+# デフォルト
+LEX.m = $(LEX) $(LFLAGS) -t
+# 環境変数
+LOADEDMODULES = 
+# デフォルト
+.LIBPATTERNS = lib%.so lib%.a
+# 環境変数
+SSH_CLIENT = 10.4.101.142 64063 22
+# デフォルト
+CPP = $(CC) -E
+# デフォルト
+LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# デフォルト
+CHECKOUT,v = +$(if $(wildcard $@),,$(CO) $(COFLAGS) $< $@)
+# デフォルト
+COMPILE.f = $(FC) $(FFLAGS) $(TARGET_ARCH) -c
+# デフォルト
+COMPILE.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -c
+# デフォルト
+COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+# 自動変数
+?F = $(notdir $?)
+# デフォルト
+GET = get
+# 環境変数
+GUESTFISH_PS1 = \[\e[1;32m\]><fs>\[\e[0;31m\] 
+# デフォルト
+LINK.r = $(FC) $(FFLAGS) $(RFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# 環境変数
+LS_COLORS = rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.m4a=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.oga=01;36:*.opus=01;36:*.spx=01;36:*.xspf=01;36:
+# 自動変数
++F = $(notdir $+)
+# デフォルト
+MAKEINFO = makeinfo
+# 'override' 疑似命令
+GNUMAKEFLAGS := 
+# デフォルト
+PREPROCESS.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -F
+# デフォルト
+LINK.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# 環境変数
+LOGNAME = root
+# デフォルト
+LINK.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# デフォルト
+YACC = yacc
+# makefile 変数
+.DEFAULT_GOAL := build
+# デフォルト
+RM = rm -f
+# 環境変数
+HISTCONTROL = ignoredups
+# デフォルト
+WEAVE = weave
+# 環境変数
+DISPLAY = localhost:12.0
+# 環境変数
+USER = root
+# デフォルト
+MAKE_VERSION := 4.3
+# デフォルト
+F77 = $(FC)
+# makefile 変数 (ファイル 'Makefile', 3 行目)
+makeTarget_64 = build_64 
+# 環境変数
+which_declare = declare -f
+# 環境変数
+DEBUGINFOD_URLS = https://debuginfod.centos.org/ 
+# デフォルト
+CWEAVE = cweave
+# 環境変数
+_ = /usr/bin/make
+# デフォルト
+YACC.y = $(YACC) $(YFLAGS)
+# デフォルト
+LINK.cpp = $(LINK.cc)
+# デフォルト
+CO = co
+# 環境変数
+XDG_RUNTIME_DIR = /run/user/0
+# makefile 変数 (ファイル 'Makefile', 5 行目)
+installTarget_64 = install_64
+# 環境変数
+S_COLORS = auto
+# デフォルト
+OUTPUT_OPTION = -o $@
+# デフォルト
+COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
+# 環境変数
+NVM_CD_FLAGS = 
+# デフォルト
+MAKE_TERMERR := /dev/pts/10
+# 環境変数
+XDG_SESSION_CLASS = user
+# 環境変数
+HOME = /root
+# デフォルト
+LEX = lex
+# 環境変数
+TERM = xterm
+# 環境変数
+XDG_SESSION_ID = 151
+# デフォルト
+LINT.c = $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+# デフォルト
+COMPILE.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# デフォルト
+.RECIPEPREFIX := 
+# 自動変数
+<F = $(notdir $<)
+# 環境変数
+define BASH_FUNC__module_raw%%
+() {  eval "$(/usr/bin/tclsh '/usr/share/Modules/libexec/modulecmd.tcl' bash "$@")";
+ _mlstatus=$?;
+ return $_mlstatus
+}
+endef
+# デフォルト
+SUFFIXES := .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+# デフォルト
+LD = ld
+# 環境変数
+GUESTFISH_RESTORE = \e[0m
+# デフォルト
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# デフォルト
+CXX = g++
+# デフォルト
+CC = cc
+# makefile 変数 (ファイル 'Makefile', 2 行目)
+makeTarget_mdascollector64 = build_mdascollector64 
+# デフォルト
+COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# 環境変数
+SSH_CONNECTION = 10.4.101.142 64063 10.1.31.126 22
+# 変数セットのハッシュテーブルの状態:
+# 負荷=154/1024=15%, 再ハッシュ=0, 衝突=7/214=3%
+
+# パターン指定 変数 値
+
+# パターン指定変数の値なし.
+
+# ディレクトリ
+
+# RCS: 状態を調べられませんでした.
+# SCCS: 状態を調べられませんでした.
+# . (device 64768, inode 202878361): 17 個のファイル, 19 個の適用不能ファイル名.
+
+# 17 個のファイル, 19 個の適用不能ファイル名 (3 個のディレクトリ内).
+
+# 暗黙ルール
+
+%.out:
+
+%.a:
+
+%.ln:
+
+%.o:
+
+%: %.o
+#  実行するレシピ (ビルトイン):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.c:
+
+%: %.c
+#  実行するレシピ (ビルトイン):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.ln: %.c
+#  実行するレシピ (ビルトイン):
+	$(LINT.c) -C$* $<
+
+%.o: %.c
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+%.cc:
+
+%: %.cc
+#  実行するレシピ (ビルトイン):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cc
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+%.C:
+
+%: %.C
+#  実行するレシピ (ビルトイン):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.C
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+%.cpp:
+
+%: %.cpp
+#  実行するレシピ (ビルトイン):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cpp
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+%.p:
+
+%: %.p
+#  実行するレシピ (ビルトイン):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.p
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+%.f:
+
+%: %.f
+#  実行するレシピ (ビルトイン):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.f
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+%.F:
+
+%: %.F
+#  実行するレシピ (ビルトイン):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.F
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+%.f: %.F
+#  実行するレシピ (ビルトイン):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+%.m:
+
+%: %.m
+#  実行するレシピ (ビルトイン):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.m
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+%.r:
+
+%: %.r
+#  実行するレシピ (ビルトイン):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.r
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+%.f: %.r
+#  実行するレシピ (ビルトイン):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+%.y:
+
+%.ln: %.y
+#  実行するレシピ (ビルトイン):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+%.c: %.y
+#  実行するレシピ (ビルトイン):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+%.l:
+
+%.ln: %.l
+#  実行するレシピ (ビルトイン):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+%.c: %.l
+#  実行するレシピ (ビルトイン):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+%.r: %.l
+#  実行するレシピ (ビルトイン):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+%.ym:
+
+%.m: %.ym
+#  実行するレシピ (ビルトイン):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+%.yl:
+
+%.s:
+
+%: %.s
+#  実行するレシピ (ビルトイン):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.s
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.s) -o $@ $<
+
+%.S:
+
+%: %.S
+#  実行するレシピ (ビルトイン):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.S
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.S) -o $@ $<
+
+%.s: %.S
+#  実行するレシピ (ビルトイン):
+	$(PREPROCESS.S) $< > $@
+
+%.mod:
+
+%: %.mod
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+%.o: %.mod
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.mod) -o $@ $<
+
+%.sym:
+
+%.def:
+
+%.sym: %.def
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.def) -o $@ $<
+
+%.h:
+
+%.info:
+
+%.dvi:
+
+%.tex:
+
+%.dvi: %.tex
+#  実行するレシピ (ビルトイン):
+	$(TEX) $<
+
+%.texinfo:
+
+%.info: %.texinfo
+#  実行するレシピ (ビルトイン):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texinfo
+#  実行するレシピ (ビルトイン):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.texi:
+
+%.info: %.texi
+#  実行するレシピ (ビルトイン):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texi
+#  実行するレシピ (ビルトイン):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.txinfo:
+
+%.info: %.txinfo
+#  実行するレシピ (ビルトイン):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.txinfo
+#  実行するレシピ (ビルトイン):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.w:
+
+%.c: %.w
+#  実行するレシピ (ビルトイン):
+	$(CTANGLE) $< - $@
+
+%.tex: %.w
+#  実行するレシピ (ビルトイン):
+	$(CWEAVE) $< - $@
+
+%.ch:
+
+%.web:
+
+%.p: %.web
+#  実行するレシピ (ビルトイン):
+	$(TANGLE) $<
+
+%.tex: %.web
+#  実行するレシピ (ビルトイン):
+	$(WEAVE) $<
+
+%.sh:
+
+%: %.sh
+#  実行するレシピ (ビルトイン):
+	cat $< >$@ 
+	 chmod a+x $@
+
+%.elc:
+
+%.el:
+
+(%): %
+#  実行するレシピ (ビルトイン):
+	$(AR) $(ARFLAGS) $@ $<
+
+%.out: %
+#  実行するレシピ (ビルトイン):
+	@rm -f $@ 
+	 cp $< $@
+
+%.c: %.w %.ch
+#  実行するレシピ (ビルトイン):
+	$(CTANGLE) $^ $@
+
+%.tex: %.w %.ch
+#  実行するレシピ (ビルトイン):
+	$(CWEAVE) $^ $@
+
+%:: %,v
+#  実行するレシピ (ビルトイン):
+	$(CHECKOUT,v)
+
+%:: RCS/%,v
+#  実行するレシピ (ビルトイン):
+	$(CHECKOUT,v)
+
+%:: RCS/%
+#  実行するレシピ (ビルトイン):
+	$(CHECKOUT,v)
+
+%:: s.%
+#  実行するレシピ (ビルトイン):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+%:: SCCS/s.%
+#  実行するレシピ (ビルトイン):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+# 92 個の暗黙ルール, 5 (5.4%) 端末。
+# ファイル
+
+# ターゲットではありません:
+.cpp:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.c.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.h:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.sh:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	cat $< >$@ 
+	 chmod a+x $@
+
+# ターゲットではありません:
+.ch:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.r.f:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.dvi:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.def.sym:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.def) -o $@ $<
+
+# ターゲットではありません:
+.m.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.lm.m:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	@$(RM) $@ 
+	 $(LEX.m) $< > $@
+
+# ターゲットではありません:
+.p.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.texinfo:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.ln:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.C:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.web:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+build_mdascollector64:
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ファイル 'Makefile', 50 行目):
+	@echo "Build for mdas_collector - build only mdas_collector.exe"
+	@make module BITS=mdascollector64
+		@for f in $(shell ls -d ../MachineModel/*/); \
+		do \
+			d=`basename $${f}`; \
+			pushd ../MachineModel/$${d}/CppCode/mdas_collector/RepoAdapter; make MODEL_TYPE="$${d}" -j 7; popd; \
+			pushd mdas_collector; make MODEL_TYPE="$${d}"; popd; \
+		done
+	#	@cd SdExtractor/app; make -s build
+
+# ターゲットではありません:
+.elc:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.y.ln:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+# ターゲットではありません:
+.l.c:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+# ターゲットではありません:
+Makefile:
+#  暗黙ルールの探索が行われました.
+#  最終修正 2025-11-07 13:50:26.10067434
+#  ファイルは更新されています.
+#  更新に成功しました.
+
+# ターゲットではありません:
+.sym:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.r.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.mod:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+# ターゲットではありません:
+.def:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.S:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.texi.dvi:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# ターゲットではありません:
+.txinfo.dvi:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# ターゲットではありません:
+.y.c:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+clean:
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ファイル 'Makefile', 111 行目):
+	@cd Common/tcp_client; make -s clean
+	@cd Common/tcp_server; make -s clean
+		@for f in $(shell ls -d ../MachineModel/*/); \
+		do \
+			d=`basename $${f}`; \
+			pushd Repository/app/RepoUtil; make MODEL_TYPE="$${d}" -s clean; popd; \
+			pushd ../MachineModel/$${d}/CppCode/Repository; make MODEL_TYPE="$${d}" -s clean; popd; \
+			pushd Repository/app/RepoMain; make MODEL_TYPE="$${d}" -s clean; popd; \
+			pushd ../MachineModel/$${d}/CppCode/mdas_collector/RepoAdapter; make MODEL_TYPE="$${d}" -s clean; popd; \
+			pushd mdas_collector; make MODEL_TYPE="$${d}" -s clean; popd; \
+		done
+	@cd FieldTypeChecker; make -s clean
+	@cd mdas_adapter; make -s clean
+	@cd mdas_reque; make -s clean
+	@rm -rf *.o *~
+
+# ターゲットではありません:
+.cpp.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+module:
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ファイル 'Makefile', 17 行目):
+	@echo "module build error. please specify BITS."
+	@cd FieldTypeChecker; make -s
+
+# ターゲットではありません:
+.el:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.cc:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.tex:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.m:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.F:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.web.tex:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(WEAVE) $<
+
+# ターゲットではありません:
+.texinfo.info:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+install_mdascollector64:
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ファイル 'Makefile', 87 行目):
+	@echo "    Installing modules in CppCode...(mdas_collector)"
+
+# ターゲットではありません:
+.ym.m:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+# ターゲットではありません:
+.l:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.f:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.texi:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.DEFAULT:
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.r:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.a:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.w.tex:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(CWEAVE) $< - $@
+
+# ターゲットではありません:
+.s.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.s) -o $@ $<
+
+# ターゲットではありません:
+.txinfo:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.c.ln:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINT.c) -C$* $<
+
+# ターゲットではありません:
+.tex.dvi:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(TEX) $<
+
+# ターゲットではありません:
+.info:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.out:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.texinfo.dvi:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+build: build_64
+#  疑似ターゲット (.PHONY の必要条件)
+#  コマンドラインターゲット.
+#  暗黙ルールの探索は行われませんでした.
+#  ファイルが存在しません.
+#  ファイルは更新されています.
+#  更新に成功しました.
+# 変数セットのハッシュテーブルの状態:
+# 負荷=0/32=0%, 再ハッシュ=0, 衝突=0/21=0%
+
+# ターゲットではありません:
+.F.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.yl:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.s:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.S.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.S) -o $@ $<
+
+# ターゲットではありません:
+.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.C.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+install: install_mdascollector64 install_64
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ファイル 'Makefile', 82 行目):
+	
+
+# ターゲットではありません:
+.c:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.txinfo.info:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# ターゲットではありません:
+.texi.info:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# ターゲットではありません:
+.y:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.l.r:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+# ターゲットではありません:
+.p:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# ターゲットではありません:
+.l.ln:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+# ターゲットではありません:
+.w:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.SUFFIXES: .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# 'override' 疑似命令
+build_64: .SHELLSTATUS := 0
+build_64:
+#  暗黙ルールの探索は行われませんでした.
+#  暗黙/静的パターン語幹: ''
+#  最終修正 2514-05-30 10:53:03.107374182
+#  ファイルは更新されています.
+#  更新に成功しました.
+# 自動変数
+# @ := build_64
+# 自動変数
+# * := 
+# 自動変数
+# < := 
+# 自動変数
+# + := 
+# 自動変数
+# % := 
+# 自動変数
+# ^ := 
+# 自動変数
+# ? := 
+# 自動変数
+# | := 
+# 変数セットのハッシュテーブルの状態:
+# 負荷=9/32=28%, 再ハッシュ=0, 衝突=1/30=3%
+#  実行するレシピ (ファイル 'Makefile', 66 行目):
+	@echo "Repository build for 64bit"
+	@make module BITS=64
+		@for f in $(shell ls -d ../MachineModel/*/); \
+		do \
+			d=`basename $${f}`; \
+			mv ../MachineModel/$${d}/CppCode/Repository/lib/py_repo_tcp.so ../MachineModel/$${d}/CppCode/Repository/lib/py_repo_tcp_64bit.so;\
+		done
+	@mv Repository/app/RepoMain/esprit_repo_mem Repository/app/RepoMain/esprit_repo_mem_64bit; 
+	@cd mdas_adapter; make -s build
+	@cd mdas_reque; make -s build
+
+.PHONY: build
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.mod.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.mod) -o $@ $<
+
+# ターゲットではありません:
+.web.p:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(TANGLE) $<
+
+# ターゲットではありません:
+.S.s:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(PREPROCESS.S) $< > $@
+
+install_64:
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ファイル 'Makefile', 92 行目):
+	@echo "    Installing modules in CppCode...(64bit)"
+	@for f in $(shell ls -d ../MachineModel/*/); \
+	do \
+		d=`basename $${f}`; \
+                rm -rf ${MDAS_ARC_DIR}/mdas_$${d}; \
+                mkdir -p ${MDAS_ARC_DIR}/mdas_$${d}/lib; \
+                mkdir -p ${MDAS_ARC_DIR}/mdas_$${d}/bin; \
+		cp -f ../MachineModel/$${d}/CppCode/Repository/lib/*.so ${MDAS_ARC_DIR}/mdas_$${d}/lib; \
+		cp -f ../MachineModel/$${d}/CppCode/Repository/bin/*.so ${MDAS_ARC_DIR}/mdas_$${d}/bin; \
+		cp -f ../MachineModel/$${d}/CppCode/mdas_collector/mdas_collector.exe ${MDAS_ARC_DIR}/mdas_$${d}/bin; \
+	done
+	@mkdir -p ${MDAS_ARC_BIN}
+	@mkdir -p ${MDAS_ARC_LIB}
+	@cp -f FieldTypeChecker/field_type_checker ${MDAS_ARC_BIN}
+	@cp -f mdas_adapter/lib/*.so ${MDAS_ARC_LIB}
+	@cp -f mdas_reque/bin/mdas_reque ${MDAS_ARC_BIN}
+	@cp -f Repository/app/RepoMain/esprit_repo_mem* ${MDAS_ARC_BIN}
+	
+
+# ターゲットではありません:
+.f.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.ym:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+
+# ターゲットではありません:
+.cc.o:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.F.f:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+# ターゲットではありません:
+.w.c:
+# ビルトインルール
+#  暗黙ルールの探索は行われませんでした.
+#  修正時刻がチェックされることはありません.
+#  ファイルは更新されていません.
+#  実行するレシピ (ビルトイン):
+	$(CTANGLE) $< - $@
+
+# ファイルハッシュテーブルの状態:
+# 負荷=82/1024=8%, 再ハッシュ=0, 衝突=124/1494=8%
+# VPATH 探索パス
+
+# 'vpath' 探索パスはありません.
+
+# 一般の ('VPATH' 変数) 探索パスなし.
+
+# strcache バッファ: 1 (0) / 文字列 = 262 / 格納 = 2792 B / 平均 = 10 B
+# 現在のバッファ: サイズ = 8162 B / 使用中 = 2792 B / 個数 = 262 / 平均 = 10 B
+
+# strcache の稼働: 探索 = 467 / ヒット率 = 43%
+# ハッシュテーブルの状態:
+# 負荷=262/8192=3%, 再ハッシュ=0, 衝突=9/467=2%
+# Make データベース終了 Fri Nov  7 16:05:25 2025
+
