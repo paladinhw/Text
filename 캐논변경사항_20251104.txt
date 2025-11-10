@@ -1,0 +1,84 @@
+regedit 에서 이름 변경하는 것.
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{978FA8D5-7F89-4FBD-8EF0-D678DFC046AB}
+Oracle virtualBox 7.2.4 -> Mingw OVB 7.2.4
+
+HKEY_CLASSES_ROOT\Installer\Products\5D8AF87998F7DBF4E80F6D87FD0C64BA
+Oracle virtualBox 7.2.4 -> Mingw OVB 7.2.4
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products\5D8AF87998F7DBF4E80F6D87FD0C64BA
+
+20251104 
+1. Visual studio code 에서 연결 - OK
+2. mdas compile 진행 - OK
+3. 원본 D드라이브 D:\wps\Ori\mdas_10_1_31_126_설치소스원본 에 복사 10.1.31.126 개발 서버 - OK
+4. Visual studio 2022 에서 실행되거나 접근 진행 - 안되는듯. fail
+5. Mingw 에서 어떤지 확인. - Not Yet
+6. 개인서버 (10.1.31.64) 개발서버(10.1.31.126) 필요 Tool들 설치 Tvision, 7za, 등.
+
+
+20251106
+1. 10.1.31.64 에 make_mdas_build_1 설치하고 Compile 함. 시간 걸림 -> 빌드해서 debug 진행 debug 가능 direct로 실행. sh에서는 어찌 될지?
+2. Xubuntu에서 make_mdas_build_1 build - 설치함 용량 부족으로 40G로 늘림, Make 진행. loop 에 빠진듯. - OK
+3. mdas_collector 의 로그 저장장소 파악 - /var/tmp/mdas/주소에 있음. - OK
+4. dotnet 9.0 tar.gz으로 설치. export to .bashrc  - OK
+5. 설치 제거에서 항목 이름 변경하면 다음 reboot 후에 적용되는듯. - 참고
+6. 로그 파일들은 /var/tmp/mdas/주소에 있음.
+7. esprit 소스는 repository폴더에 주로 있음.
+8. esprit 소스중에 장비 아래있는 tcpserver 아래있는 소스는 Serv_TcpRepository_(A1, A2, B1, B2, BCS, Common, JS1, VCS)는 모두 99% 동일함. - refacoring 하고싶음. 나중에 줄여야 겠음.
+9. tcp_client 에 있는 소스들은 Excel 에서 만드는지 확인 필요. Excel 에서 만드니까 공통화할 소스들이 모두 분리되어 있는듯.
+
+20251107
+1. tcpclient 와 tcpserver AAOffsetData 갈은 Event Class의 IF_AAOffsetData.hpp 같은 곳에서 dbinser를 할때  에서 tcp write 를 한다. 어디로 가나?
+2. esprit 가 만들어 지는 곳이 2곳 인듯. 어느 것인지? 2번인듯. 그것을 mv esprit_repo_mem esprit_repo_mem_64bit 로 만들어 사용.
+	1) output/dev/CppCode/Common/RepoMain/
+	2) output/dev/CppCode/Repository/app/RepoMain/  (이것이 메인)
+3. esprit는 make 로 빌드 하면 됨. (build_mdascollector64 아래는 comment)
+4. jenkins 알려줌. http://10.1.31.126:8080/ admin ckrpass2
+5. esprit 바꿔서 실행 파악진행 하자.
+6. 이후 esprit 와 data_collector의 통신 방법을 찾아야 함.
+
+20251110
+1. 새로 빌드한 esprit 로 교환후 replog 진행 데이터 들어오는 것 확인(로그로 정확히는 모름) - esprit_repo_mem_202511100944_40374.log
+   - 2025-11-10 09:57:45,908 (ThreadID:139630614369856) [INFO] [DB_TMWACStationStatus.cpp(129)] StationNo[0] DB_SetLastInstance post lastObjId = 174, nWait = 0
+2. mdas_collector 와 esprit 통신 확인 - 포트 변경 예정
+3. 각 Machine type 의 라이브러리를 로드함. 예 : [DL] MACHINE_LIB_PATH = /console/mdas/MachineModel/TX_101/bin/libTX_101.so 
+4. RepoAdapter가 만들어진후 mdas_collector에서 exe make 가능. (Makefile 에 MODEL_TYPE		= TX_101 추가해야 함) - make_mdas_build_1.st2.7z
+5. WACStatusLocationDAta  TMValMatDataRepoAdapter 로그에서 찾기.
+6. esprit 통신은? 아래에 힌트가 있을까?
+
+	TMValMatDataRepoAdapter
+
+	mdas_collector 쪽
+
+	2025-11-10 09:54:16,044 (ThreadID:140483739248192) [INFO] [TMValmatDataRepoAdapter.cc(546)] TMValmatDataRepoAdapter::onMessage: VCS Station New object(1) created for msgId=180151
+	2025-11-10 09:54:16,045 (ThreadID:140483739248192) [INFO] [TMValmatDataRepoAdapter.cc(579)] TMValmatDataRepoAdapter::onMessage: Object(1) pushed to queue for msgId=180151
+	2025-11-10 09:54:16,045 (ThreadID:140483739248192) [INFO] [LogCollector.cc(380)] mdas_collector.exe: JobID:170, waferId:5, waferInLot:1, msgid:180151, Event Time sec:1762736072, usec:659890
+
+	esprit 쪽
+	2025-11-10 09:54:16,044 (ThreadID:139630614369856) [INFO] [DB_TMValmatData.cpp(187)] StationNo[6] DB_GetId Exec pthread_mutex_lock. lastObjId = 1. mutexId = 0
+	2025-11-10 09:54:16,044 (ThreadID:139630614369856) [INFO] [DB_TMValmatData.cpp(128)] StationNo[6] DB_SetLastInstance post lastObjId = 1, nWait = 0
+	2025-11-10 09:54:16,046 (ThreadID:139630614369856) [INFO] [DB_TMValmatData.cpp(187)] StationNo[6] DB_GetId Exec pthread_mutex_lock. lastObjId = 2. mutexId = 0
+
+	TMValmatDataRepoAdapter 575 줄에서 f.dbTranser를 하는데 이것이 esprit??? 에 가는 것인가?
+		// Push to queue
+		if (f.dbTransfer() != 0) {
+			LOGREPO_ERROR( logger, "%sRepoAdapter::onMessage: Object(%d) dbTransfer failed for msgId=%d", REPO_ADAPTER_NAME, objectId, msgId );
+			return -1;
+		}
+
+	int  F_TMValmatData_VCS::dbInsert(boost::shared_ptr<TMValmatData> obj) 의
+	    // オブジェクトの情報をDBにInsert
+		아래가 tcp 전송과 관계가 있을까?
+    copyToDB(*obj, in.container[0]);
+    rtn = DB_Insert_TMValmatData(in);
+	
+	Uni_TMValmatData.cpp 에서 보내는 것이 아닐까? (MachineModel/TX_101/CppCode/Repository/app/tcp_client/)
+	
+	TMValmatData.cpp (app/repo_if/) 에 F, I 들이 정의되어 있음. 뭐지?
+	DB_...는 어디에 있을까? 있음. DB는 mdas_collecter 에서 쓰지는 않는 것 같음. esprit 로고에 있음. 그렇다면 DB는 esprit
+	DB_TMValmatData.cpp (app/storage/) 에 있음. 
+	DB_TMValmatData.hpp (Repository/inc/ 에있음). 
+	
+	Uni_TMValmatData.cpp (TX-101/CppCode/Repository/app/tcp_client) F_ClientTcpIo 따라가다보면 -> IF_ClientTcpio.h(dev/rel_edge_common/EC1.1/CPPCode/inc) -> ClientTcpIo.cpp(EC1.1/CppCode/... 같음) exec 사용. 
+	//EC1.1 libtcp_common_client.a libtcp_common_server 를 만드네. 
