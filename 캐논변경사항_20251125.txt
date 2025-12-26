@@ -1,0 +1,13 @@
+20251125
+1. CommonRepoInterface, CommonRepoDatas는서로 연결된 파일들 생성시 추가.
+
+20251126
+1. initialize, register, execute json 대응해서 만듬. 
+2. map 에 shared_ptr 적용.
+3. parsing 하는것 남음.
+4. Json init 로 변경할때 주의할 곳
+   MDASCollect.cc 214 234 m_dcdpConnector 초기화 하는 곳. 변경된 항목으로 진행할 수 있어야 함.
+   
+20251227
+1. StatusManagerData 를 json 으로 표시한 것 성공.
+2. 향후 Json 작성할시 -> 표시안하는 것. int double 0  object null , 문자열은 표시하고... ""

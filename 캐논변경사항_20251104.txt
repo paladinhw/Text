@@ -44,6 +44,7 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\
 2. mdas_collector 와 esprit 통신 확인 - 포트 변경 예정
 3. 각 Machine type 의 라이브러리를 로드함. 예 : [DL] MACHINE_LIB_PATH = /console/mdas/MachineModel/TX_101/bin/libTX_101.so 
 4. RepoAdapter가 만들어진후 mdas_collector에서 exe make 가능. (Makefile 에 MODEL_TYPE		= TX_101 추가해야 함) - make_mdas_build_1.st2.7z
+   RepoAdapter 는 TX_101/CppCode/mdas_collecter/RepoAdapter 에 있음. compile 되면 바로 아래 libRepoAdapter.a 를 남김. 
 5. WACStatusLocationDAta  TMValMatDataRepoAdapter 로그에서 찾기.
 6. esprit 통신은? 아래에 힌트가 있을까?
 
@@ -60,7 +61,7 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\
 	2025-11-10 09:54:16,044 (ThreadID:139630614369856) [INFO] [DB_TMValmatData.cpp(128)] StationNo[6] DB_SetLastInstance post lastObjId = 1, nWait = 0
 	2025-11-10 09:54:16,046 (ThreadID:139630614369856) [INFO] [DB_TMValmatData.cpp(187)] StationNo[6] DB_GetId Exec pthread_mutex_lock. lastObjId = 2. mutexId = 0
 
-	TMValmatDataRepoAdapter 575 줄에서 f.dbTranser를 하는데 이것이 esprit??? 에 가는 것인가?
+	TMValmatDataRepoAdapter 575 줄에서 f.dbTranser를 하는데 이것이 esprit??? 에 가는 것인가? (MachineModel/TX_101/CppCode/mdas_collecter/RepoAdapter 에 있음.) 
 		// Push to queue
 		if (f.dbTransfer() != 0) {
 			LOGREPO_ERROR( logger, "%sRepoAdapter::onMessage: Object(%d) dbTransfer failed for msgId=%d", REPO_ADAPTER_NAME, objectId, msgId );

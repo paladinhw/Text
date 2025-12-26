@@ -1,0 +1,148 @@
+20251201
+- WACStatusLocationData if 문 해석진행
+- Vector< pair<bool, function<>> 사용하여 진행할 예정
+- mdas_collector.exe 생성
+
+20251202
+- 실행진행.
+- assign 에 "Default" 항목을 넣어야 함.
+- 람다 만들때 값, 참조 주의 참조는 추후 참조한것이 없어질 수 있음.
+	sf1 = [&, sname, pdata]() {
+	
+20251203
+- doFuncHandleIf 만들어서 if 관련 옮김.
+
+
+20251204
+- params 를 값 복사로 변경함.
+- TMValmat json 만들면서
+   Value밑에 F1 은 V5를 만들기 위한것 그래서 Assignee 를 쓸필요가 없음. Value를 만들기 위한 기능이기 때문에 중간값이 별도로 필요한 경우 "MiddleValue" 로 넣자
+   나중에 복잡한 식은  MiddleValue 와 Assignee 를 추가할 수 도 있을듯. 그때 재 정의할 필요있음.
+   Vn 의 Name 과 관련 없는 Fn은 만들지 않음.
+		"V5" : {
+			"Name" : "searchParamName_",
+			"Param" : 100,
+			"Type" : "string",
+			"Func" : "Function",
+			"Num_Function" : 3,
+			"F1" : {
+				"Type" : "Normal",
+				"Function" : "strcat",
+				"Num_Argument" : 3,
+				"Arguments": ["P1", "P3"],
+				"Type_Arguments" : ["chars", "chars", "chars"],		
+				"Func" : "assign",
+				//중간값이 필요없이 Value 의 Name에 바로 넣어 연산할 수 있음. 
+			},
+			
+- strcat 은 변수가 2개, 2개 이상은 Fn으로 분리해야 함.	
+			
+20251205
+- 일본측과 회의 결과 공유
+   - 우선 계속 진행
+   - MachineModel 변경 할 예정  TX_101
+   - Boost::python으로 동적 해석 진행도 고려
+   - Euc-jp 로 추가 변경
+   - 새로운 소스 공급 예정.
+   - 일본 Computer 에 원격 접속해서 진행할 수도
+   
+- 와 간단한 Typing error int k; ...
+	for(int k=0; k<inumfunction; k++) {
+	
+- if(ftname.find("strcat") != string::npos) { 이 코드 부분에서
+- //P1 등 Pn은 Parmeter 를 나타냄으로 P다음 숫자를 구함. P로 시작하는 문자열의 경우 *P 등으로 문자임을 표시 *P 문자는 **P 등으로
+
+
+
+
+- TMValmatData
+
+BCS VCS 주의 다른것과 다름. - 살림.
+
+20251208
+- Start msg, mid msg, end msg 로 함수 분리 함.
+- StatusManagerData 에서 데이터 들어오는 것 확인 모든 MsgId가 들어오는 것이 아님. TOOLT6_20251208201914.json_OnGoing "countofDrivingStageXFlatCable_": 319884, 확인
+- 내일 TMValmatData json 추가 만들어야 함. 
+
+
+20251209
+- Start end mid 로 구별했고, doFRegisterToRepo_MsgId 로 메시지 처리부분 분리시킴
+- istation을 적용하기 위한 방법.
+- 현재까지는 잘 실행됨.
+
+20251210
+- Station 도입. Default 가 기본
+- 기존 Station 에서 Common 은 Default 일까?
+- params 100 을 -1 로 바꿔어 테스트
+- EPCPowerStartEvent json 은?
+이 event json 출력은 EPCPowerOnEvent 라고 함.
+{
+  "tool": "TOOL1",
+  "data": [
+    {
+      "event_id": "EPCPowerOnEvent",
+      "event_time": "2025-12-10T16:26:56.341232+0900",
+      "CTX-stage": "0"
+    },
+    {
+      "event_id": "EPCPowerOnEvent",
+      "event_time": "2025-12-10T16:26:57.344050+0900",
+      "CTX-stage": "0"
+    }
+  ]
+}
+
+// datagenerator.py 에 Json 변경
+CommandEvent
+(recipeName)
+
+- EPCPowerStartEvent, WaferSeq, LoadDataRepo 진행도
+  -EPCPowerStartEvent : 그냥 return 0, 컨디션 파라메터 등록
+  
+	bool isStartMsg( int msgId, vector<BasicData>& params ) {
+		if ( m_startMsgId == msgId ) {
+			return isMsgCond(msgId, params, m_startMsgCondMap);
+		}
+		return false;
+	}
+  
+  
+  - WaferSeq : 컨디션 파라메터 등록, Esprit_repo_mem 전송
+  
+  	
+	{
+  "EPCPowerStartEvent" : {
+    "StartMid" : 400020,
+    "EndMid" : 400020,
+    "StartCondition" : [
+      {
+        "Value" : "PCS-CS Daemon Exec$",
+        "Index" : 2,
+        "Type" : "string"
+      }
+    ],
+    "EndCondition" : [
+      {
+        "Value" : "PCS-CS Daemon Exec$",
+        "Index" : 2,
+        "Type" : "string"
+      }
+    ]
+  }
+}
+
+  
+  - LoadData : 인스턴스화 - Context info 수정
+  
+  		// Create instance
+		if (f.getLatestObject(objectId, objLoadData) != 0) {
+		}
+		else {
+			objLoadData.context_ = context; //이부분.
+			if (f.setLatestObject(objLoadData) != 0) {
+				LOGREPO_WARN( logger, "%sRepoAdapter:: setLatestObject failed for msgId=%d, object(%d)", REPO_ADAPTER_NAME, msgId, objectId );
+				return -1;
+			}
+		}
+
+   

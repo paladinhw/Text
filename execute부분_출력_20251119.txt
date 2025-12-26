@@ -1,0 +1,66 @@
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 3 v.str size is 8 is ?2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(952)] SOP MakeJSON RepoAdapter Name : WACStatusLocationData, time P4 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(63)] SOPJ2 CommonRepoAdapter Create #1 RA EvName WACStatusLocationData Expiry 0
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(102)] SOPJ2 CommonRepoAdapter #1 msgId 130036 tmVal 1763539568 param size 673826
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(194)] SOPJ2 CommonRepoAdapter OM Default #1 msgId 130036 tmVal 1763539568 param size 673826 iStation 4
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(982)] SOP Vector Json added : WACStatusLocationData, 20251119170608673826, vec size 5 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(895)] SOPJ2 executeMessageHandler m_msgIdHandlerMapJ2 size 3 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(899)] SOPJ2 executeMessageHandler msgId 130036 tmVal 1763539568 param size 673826 vrepo size 4
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(903)] SOPJ2 executeMessageHandler EName WACStatusLocationData
+, num 0
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(910)] SOPJ2 executeMessageHandler String Comp WACStatusLocationData
+, ctr 0
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(102)] SOPJ2 CommonRepoAdapter #1 msgId 130036 tmVal 1763539568 param size 673826
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(194)] SOPJ2 CommonRepoAdapter OM Default #1 msgId 130036 tmVal 1763539568 param size 673826 iStation 4
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(913)] SOPJ2 Adaper Message ctor 0, RepoAdapter Name : WACStatusLocationData
+, CRExpire 0 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(914)] SOPJ2 Context1 jobid 0, waferid : 0, reticid -1 waferInlot 21, patch -1
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(915)] SOPJ2 Context2 shot -1, mark : -1, jobtype 1 tasktype -1, funcid -1
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(916)] SOPJ2 Context3 logicalui -1, physicalui : -1, userid -1 appid -1, airev -1
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(917)] SOPJ2 Context4 piRev -1, stage : 0
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 0 v.str size is 8 is ?2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 1 v.str size is 8 is 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 2 v.str size is 8 is 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 3 v.str size is 8 is ?2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(453)] mdas_collector.exe: JobID:0, waferId:0, waferInLot:21, msgid:130036, Event Time sec:1763539568, usec:674029
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(855)] SOP msgId 130036 tmVal 1763539568 param size 674029 vrepo size 4
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(860)] SOP Adaper Message ctor 0, RepoAdapter Name : TMWACStationStatus, CRExpire 0 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(861)] SOP Context1 jobid 0, waferid : 0, reticid -1 waferInlot 21, patch -1
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(862)] SOP Context2 shot -1, mark : -1, jobtype 1 tasktype -1, funcid -1
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(863)] SOP Context3 logicalui -1, physicalui : -1, userid -1 appid -1, airev -1
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(864)] SOP Context4 piRev -1, stage : 0
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 0 v.str size is 8 is ?2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 1 v.str size is 8 is `
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 2 v.str size is 8 is 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 3 v.str size is 8 is ?2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [LogCollector.cc(952)] SOP MakeJSON RepoAdapter Name : TMWACStationStatus, time ? 
+2025-11-19 17:05:45,397 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(63)] SOPJ2 CommonRepoAdapter Create #1 RA EvName TMWACStationStatus Expiry 0
+2025-11-19 17:05:45,398 (ThreadID:140067808998976) [INFO] [WACStatusLocationDataRepoAdapter.cc(162)] WACStatusLocationDataRepoAdapter::onMessage: COMMON Station New object(5) created for msgId=130036
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [WACStatusLocationDataRepoAdapter.cc(196)] WACStatusLocationDataRepoAdapter::onMessage: Object(5) pushed to queue for msgId=130036
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(860)] SOP Adaper Message ctor 1, RepoAdapter Name : WACStatusLocationData, CRExpire 0 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(861)] SOP Context1 jobid 0, waferid : 0, reticid -1 waferInlot 21, patch -1
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(862)] SOP Context2 shot -1, mark : -1, jobtype 1 tasktype -1, funcid -1
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(863)] SOP Context3 logicalui -1, physicalui : -1, userid -1 appid -1, airev -1
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(864)] SOP Context4 piRev -1, stage : 0
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 0 v.str size is 8 is ?2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 1 v.str size is 8 is `
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 2 v.str size is 8 is 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(869)] SOP Parms num 3 v.str size is 8 is ?2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(952)] SOP MakeJSON RepoAdapter Name : WACStatusLocationData, time ? 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(63)] SOPJ2 CommonRepoAdapter Create #1 RA EvName WACStatusLocationData Expiry 0
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(102)] SOPJ2 CommonRepoAdapter #1 msgId 130036 tmVal 1763539568 param size 674029
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(194)] SOPJ2 CommonRepoAdapter OM Default #1 msgId 130036 tmVal 1763539568 param size 674029 iStation 4
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(982)] SOP Vector Json added : WACStatusLocationData, 20251119170608674029, vec size 6 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(895)] SOPJ2 executeMessageHandler m_msgIdHandlerMapJ2 size 3 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(899)] SOPJ2 executeMessageHandler msgId 130036 tmVal 1763539568 param size 674029 vrepo size 4
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(903)] SOPJ2 executeMessageHandler EName WACStatusLocationData
+, num 0
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(910)] SOPJ2 executeMessageHandler String Comp WACStatusLocationData
+, ctr 0
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(102)] SOPJ2 CommonRepoAdapter #1 msgId 130036 tmVal 1763539568 param size 674029
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [CommonRepoAdapter.cc(194)] SOPJ2 CommonRepoAdapter OM Default #1 msgId 130036 tmVal 1763539568 param size 674029 iStation 4
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(913)] SOPJ2 Adaper Message ctor 0, RepoAdapter Name : WACStatusLocationData
+, CRExpire 0 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(914)] SOPJ2 Context1 jobid 0, waferid : 0, reticid -1 waferInlot 21, patch -1
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(915)] SOPJ2 Context2 shot -1, mark : -1, jobtype 1 tasktype -1, funcid -1
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(916)] SOPJ2 Context3 logicalui -1, physicalui : -1, userid -1 appid -1, airev -1
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(917)] SOPJ2 Context4 piRev -1, stage : 0
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 0 v.str size is 8 is ?2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 1 v.str size is 8 is `
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 2 v.str size is 8 is 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(922)] SOPJ2 Parms num 3 v.str size is 8 is ?2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(453)] mdas_collector.exe: JobID:0, waferId:0, waferInLot:21, msgid:130036, Event Time sec:1763539568, usec:674358
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(855)] SOP msgId 130036 tmVal 1763539568 param size 674358 vrepo size 4
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(860)] SOP Adaper Message ctor 0, RepoAdapter Name : TMWACStationStatus, CRExpire 0 
+2025-11-19 17:05:45,399 (ThreadID:140067808998976) [INFO] [LogCollector.cc(861)] SOP Context1 jobid 0, waferid : 0, reticid -1 wafer

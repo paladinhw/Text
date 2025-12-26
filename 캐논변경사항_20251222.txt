@@ -1,0 +1,73 @@
+20251222
+- ErrorEvent.json 작성과 
+- ClassicRepo 지우는 작업 진행
+- MDASCollector.cc 에 m_logCollector 처리해야 함.
+   MSGHDLR  - 
+   typedef vector<RepoAdapter*> MSGHDLR;
+   MSGHDLR m_msgIdHandler;  <- m_msgIdHandler.push_back((RepoAdapter*)new AutoQCEndEventRepoAdapter(
+- msgIdVector 를 가짜로 만들어 제공하기로 우선 진행.
+-  //#3_12 이하에서 멈춘 경우 발생. 다시 발생 20251222 TMValmatData. 원인은 ( #14_1 -> %s, j )
+
+20251223
+
+LogCollector.cc
+- m_msgIdHandler  216줄  - for 돌면서 msgId 구함. (m_msgIdSet 이용)
+   m_msgIdHandlerMap 를 만듬. 
+   
+   typedef std::map< int, MSGHDLR > MSGHDLRMAP;
+   MSGHDLRMAP m_msgIdHandlerMap; 구성됨. MSGID에 따른 Map 이것도 강제로 구성해야 할듯.
+   이것을 executeMessageHandler 에서 사용함. 이것을 구해야 할듯.
+   
+   Json 은 m_msgIdHandlerMapJ2Json 만들어 사용함. 
+   
+1. LogCollector 1250줄에 m_msgIdHandlerMap 의 second 로 repoadapter.onMessage를 실행시킴.  이것이 메인으로 하는 일일듯.
+2. 그외 내가 Log 만든 것들.
+
+CLASSICREPO 첫번째 시도 잘 작동하는 듯.
+
+IF 아래 split 는 split_count 로 이름 바꿈. 같은 split 가 있어서
+"Return" : -1 추가해야함.
+
+20251224
+- makefile 에 2개의 Define 추가
+   ADD_CLASSICREPO 정의되면 -> -DCLASSICREPO 추가와 library, path 추가함. 기존 Repoadapter 빌드됨.
+      - ADD_CLASSICREPO 가 없으면 기존 RepoAdater 없이 빌드됨.
+   WSSOCKET 정의되면 -> -DWSSOCKET 추가와 library, path 추가됨. Websocket 서버 구축됨.
+      - CommonRepoGroup 에서 WSSOCKET 서버 9002 에 구축됨. Alma 에서는 firewall 에 9002 open 해야 함.
+	  
+- ADD_CLASSICREPO, WSSOCKET 모두 없애고 또는 하나만 있게 하고 빌드함. 모두 작동함.
+   현재는 CLASSICREPO 없이 WSSOCKET 있게 빌드해서 진행
+- websocket 9002 는 외부에서 접속할 수 없음. 
+
+추후 진행할 일
+ErrorEvent python 진행.
+
+- 리커버리 를 확인
+
+Logcollector.cc
+892줄
+TSV, 결과 json 형식이 정해져 있음. json형식 으로 바꿔서 저장. 
+
+if ( m_autoRecoveryFlag ) {
+
+saveMessageToTSV ongoing
+
+finalizeTSVFile(true); tsv
+
+filepush.py -> mdas_collector 에서 호출하도록 
+filepush 실행하면서 mutex 를 신경 써야 할듯.
+filepush가 ongoing을 json 으로 만들고 lock 해제. 
+
+mdas_collector 에서 실행조건 파악 -> 해서 filepush 실행. 추후에 조건이 확실해지면 진행.
+
+Thread -> filepush json 을 다른 서버 전송.
+
+20251226
+
+ncurses-devel-6.2-10.20210508.el9.x86_64.rpm
+ncurses-term-6.2-10.20210508.el9.noarch.rpm
+
+rpm -Uvh 와 rpm -ivh 로 설치함.
+그리고 tvision 에서 cmake.. 함. 그래도 안되었는데.
+export XTERM=termc 하면 실행은 됨.
+

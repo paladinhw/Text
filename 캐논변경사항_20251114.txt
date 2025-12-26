@@ -1,0 +1,63 @@
+20251114
+
+1. CommonRepoAdapter.cc 적용. 
+   WACStatusLocationDataRepoAdapter.cc 참고로 추가
+   onmessage_A1 추가 진행. 여기에 F_WACStatusLocationData_A2(Class DB) 와 WACStatusLocationData Class 사용함. 그런데 사용 필요 없을듯. RepoAdapter에서 주로진행가능
+   
+2. Startmid, endmid 가 존재함. Event 가 시작과 끝 사이 메시지를 전송. 그리고 switch id 존재함
+3. 이것은 아닌듯. Event 사이에는 다른 Event가 끼어들지 않는 것으로 보임. RepoAdapter 가 Static 으로 하나만 존재함.  
+   RepoAdapter::isStartMsg(msgId, params)  이 문제인데 static 도 아니면서 이렇게 쓰는 것이 가능한가? 컴파일 잘되고 실행도 잘됨. 우선 된다고 하고 넘기자
+   
+20251117
+
+1. WACS Event 는 같은 station 이 연속으로 들어올 수 있다고 함.
+2. 같은 Station 에서 WACS Event가 연속으로 들어오면 먼저 들어온 Event를 없앤다고 함. 그래서 1개만 남아 있음. 
+3. commonrepoadapter 외에 commondata 가 있으면 될까? CommonData 에서 json을 읽고 A1 A2 한개씩 만들면 될듯.
+
+CommonRepoData는 8개의 station을 가진다. iname에 따라. 
+
+
+20251118
+1. LogCollector 에서 initialize 에서 initMessageIDHandler를 통해 m_msgIdHandler 에 RepoAdapter를 push_back 한다. 
+2. 또 registerMessageHandler 를 통해 MSGHDLRMAP m_msgIdHandlerMap;,  typedef std::map< int, MSGHDLR > MSGHDLRMAP; (typedef vector<RepoAdapter*> MSGHDLR;) Map 에 모든 event repo adapter 추가함. 
+   근데 왜 이렇게 복잡하게 하지? - 하나의 repoadapter 에 여러개의 메시지가 있어서 그런듯.
+   		for (int repo_ctr = 0; repo_ctr < (int)m_msgIdHandler.size(); ++repo_ctr) {
+			vector<int> vmsgIds = (m_msgIdHandler[repo_ctr])->getMessageIds();
+			for (int msgId_ctr = 0; msgId_ctr < (int)vmsgIds.size();  ++msgId_ctr ) {
+				registerMessageHandler(vmsgIds[msgId_ctr], m_msgIdHandler[repo_ctr]);
+			}
+		}
+		
+	이 코드는 msgId 에 따라 모든 RepoAdapter를 map으로 만드네. 고것은 MSGHDLRMAP 임. 
+3. RepoAdapter 에서 msgId를 저장하는 	std::set<int> m_msgIdSet; // Used set to ensure unique msgIds only 이 존재함. 
+4. 그러면 msgId를 여러개 가지니까? msgId로 구별되는 것은 아니군.
+5. msgid 는 정해져 있는듯. WACStatusLocationDataRepoAdapter 의 경우는 아래로 초기에 설정.
+   		RepoAdapter::addMsgId(START_MSGID);
+		RepoAdapter::addMsgId(130036);
+		RepoAdapter::addMsgId(END_MSGID);
+	그래서 이전 프로그램에서 설정한 RepoAdapter를 사용하면 안됨. - WACStatusLocationDataRepoAdapter 소스를 사용하게 됨.
+6. 이것은 Json으로 읽어서 CommonRepoAdapter 에서 만들것을 사용해야 함.
+7. initMessageIDHandler, registerMessageHandler 를 새로운  CommonRepoAdapter 에 맞게 추가해야 함.
+   m_msgIdHandlerMap, MSGHDLRMAP, MSGHDLR 변수들을 새로운 CommonRepoAdapter에 맞게 추가해야 함. 우선 
+8. initMessageIDHandler()를 새로운 것을 만들어야 함.
+   initMessageIDHandler2() 진행.
+9. 기존 RepoAdapter (WACS, TMV) 에 기반한 자료 구조를 만들면 안됨.
+10. CommonRepoGroup, CommonRepoDatas 는 필요가 없을 수 도 있음. 찬찬히 봐야 함. CommonRepoAdapter 에 m_msgIdSet 이 있음. 그리고 station별 변수들이 있음. 
+
+20251119
+1. LogCollector initialize 와 executeMessageHandler 를 많이 따라감. CommonRepoAdapter 에서 OnMessage 까지 처리한 것 같음. 
+2. 세부 작동들을 맞추면 vector 에 쌓을 수 있을 것 같음. End 잡으면 JSON만드는 작업 들어가면 될까?
+3. 결국 CommonRepoAdapter 가 기본 Class가 되는 것인가? 모든 CommonRepoAdapter instance들을 제어할 수 있는 함수는 어디에 LogCollector에 또는 CommonRepoAction을 만들까?
+4. RepoAdapter 초기화 안하는 경우 front 사용하면 프로그램 fault 남. 앞으로 주의요.
+
+20251120
+1. objectid 를 만드는 것은 F_WACStatusLocationData_Common::openLatestObject 함수에서 obj->ID_WACStatusLocationData_ = out.id; 인듯. 외부에서 만들어 보내주는데 
+2. CommonRepoAdapter 까지 타고 들어와서 저장하는 것 OK, WACS와 TMV 는 start와 end가 같아 바로 저장. 그래서 다른 event를 찾는 작업진행
+3. StausManagerDataRepoAdapter, WACStatusManagerDataRepoAdapter는 Start와 end가 달라 테스트 가능.
+4. CommonRepoData를 만들어야 할듯.
+
+20251124
+1. json 작성, json 폴더에서 넣은후 읽는 코드 진행.
+2. CommonRepoData 생성시 CommonRepoInterface 에 추가하는 코드 작성 이부분 선언 위치가 중요. 지금은 됨.
+3. CommonRepoInterface 추가. Makefile에서 빠져 있어서 문제가 있었음. Copilot 에서 해결
+

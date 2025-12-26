@@ -1,0 +1,145 @@
+
+20251111
+Logrepo_info
+1. mdas_collecter 에서 바로 json 만드는 방법 구현 바람.
+2. JSON구조 파악 해야 할듯
+3. Data Generator python 구조 파악 요.
+4. libTX_101.so 는 esprit에서 사용 tcp_server 에서 Serv_TcpRepo.o 가 이름 변경한 것.
+5. MSGHDLRMAP 에 대해
+   typedef vector<RepoAdapter*> MSGHDLR;
+   typedef std::map< int, MSGHDLR > MSGHDLRMAP;
+   MSGHDLRMAP m_msgIdHandlerMap; //   
+   int LogCollector::registerMessageHandler( int msgId, RepoAdapter *handler ) 로 register
+   int LogCollector::initialize( string conf_file )
+   TX_101 directory로 가서 ReisterRepoAdapter.cc (TX_101/CppCode/mdas_collecter/RepoAdapter) 에서 추가함.
+   void LogCollector::initMessageIDHandlers( void )
+      다음과 같이 만듬.  m_msgIdHandler.push_back((RepoAdapter*)new AutoQCEndEventRepoAdapter(getRepoAdaterCfg(std::string(AutoQCEndEventRepoAdapter::REPO_ADAPTER_NAME))));
+   
+   getRepoAdaterCfg(관련 (RegisterRepoAdapter.cc 에서) 이름을 받고 번호를 넘겨줘. 
+   m_repoAdapterCfgMap, <-  REPOADAPTERCFG m_repoAdapterCfgMap;  typedef std::map<std::string, unsigned int> REPOADAPTERCFG; typedef std::map<std::string, unsigned int>::const_iterator REPOADAPTERCFG_I;
+   int LogCollector::initRepoAdapterCfgMap( string conf_file ) <- config 파일에서 무엇을 받는군.
+	  
+   LogCollector 는 m_logCollector 로 MDASCollector.cc 에서 초기화 됨. 
+   string repo_adapter_conf_file = string(mdas_home) + string("/MachineModel/") + string(machine_type) + string("/etc/silence_detection.conf"); (/console/mdas/MachineModel//TX_101/etc/silence_detection.conf 로 있음.)
+   if (m_logCollector->initialize(repo_adapter_conf_file) == -1) {
+   
+   알고자 하는 것은 TMV 는 config 에 없음. 그런데 Initialize 할때 어떻게 createExpiry 가 설정 되는지 ? 아 기본값 0인가?
+
+6. RepoAdapter 초기화 해서 (void LogCollector::initMessageIDHandlers( void )) - m_logCollector 에 담기는 것 확인 getName, getExpire 로 데이터 확인 (log 에서 확인)
+    2025-11-11 15:08:51,948 (ThreadID:140548902806400) [INFO] [MDASCollector.cc(218)] SOP RepoAdapter CRExpire 0, RepoAdapter Name : TMValmatData
+	왜 CRExpire 는 0 이지 /console/mdas/MachineModel/TX_101/etc/silence_detection.conf 에서 읽으면 다른 것은 1000 이 되어야 하는데 . 확인요.
+	
+	코드에 # 은 무시하게 코딩되어 있음. 아래와 같이 코드에 추가함.
+	3332025-11-11 16:38:08,758 (ThreadID:140287848474176) [INFO] [LogCollector.cc(771)] SOP Adaper Message ctor 0, RepoAdapter Name : TMValmatData, CRExpire 0
+
+7. DataGnerator.py 는 JSON 파일을 /LOG/mdas/output/TOOL1/Liplus/ 에 TOOL1_date.json 으로 쓰고 있음.
+
+20251112
+1. Repo Adapter 가 context state 에 따라 분기되는 것도 있고 object 의 유무에 따라 분기되는 것도 있음. 
+   FocusStepShotDataRepoAdapter 의 경우 isObject, isEndMsgId 에서따라 registerToRepo 함수를 실행시키기도 하고 f.getLatestObject 를 실행시키기도 함. 
+   WACStatusLocationDataRepoAdapter 의 경우 state 에 따라 onMessage_Common 또는 onMessage_A1 등으로 분기되는
+   이 모든 함수는 JSON에 넣을 데이터를 추가/삭제 변경 일테니까.
+   그런데 목표는 이를 모두 JSON으로 바꾸는 것이다. 
+   RepoAdapter.cc 소스로 JSON을 유추 할 수 있어야 할듯.
+2.  json 파일과 DB_WACStatusLocationData 와의 관계
+	MAX_REPO_CONTAINER = 400 (inc/RepositoryCommon.hpp:#define MAX_REPO_CONTAINER 400)
+	struct 에서 6개는 배당되네... 
+	
+	다음은 JSON
+    {
+      "event_id": "WACStatusLocationEvent",
+      "event_time": "2025-11-06T14:15:16.556613+0900",
+      "CTX-jobId": 172,
+      "CTX-jobType": 1,
+      "CTX-stage": "0",
+      "CTX-waferId": 72,
+      "CTX-waferInLot": 21,
+      -> "BufferWaferLabel": "",
+      -> "BufferWaferStatus": "",
+      -> "CarrierWaferLabel": "WAC_Lp1_10",
+      -> "CarrierWaferStatus": "LP01-20250906-121504.10'Robot6-L'Product'IN PROCESS'Reserved'9249'7'NORMAL'DISABLE'DISABLE'DISABLE'91031'EXECUTED'EXECUTED'NOT EXECUTED'NOT EXECUTED'NOT EXECUTED'NOT EXECUTED'0",
+      -> "SsBufferWaferLabel": "",
+      -> "SsBufferWaferStatus": ""
+    },
+   
+   다음은 struct
+   typedef struct {
+    int ID_WACStatusLocationData_;
+    uint32_timeval_t endTime_;
+    ContextInfo context_;
+    E_Bool exported_;
+    char carrierWaferLabel_[MAX_REPO_CONTAINER];
+    char carrierWaferStatus_[MAX_REPO_CONTAINER];
+    char bufferWaferLabel_[MAX_REPO_CONTAINER];
+    char bufferWaferStatus_[MAX_REPO_CONTAINER];
+    char ssBufferWaferLabel_[MAX_REPO_CONTAINER];
+    char ssBufferWaferStatus_[MAX_REPO_CONTAINER];
+} __attribute__((__packed__)) S_WACStatusLocationData;
+
+3. DataGenerator.py ( mdas/bin/ )
+   python log 파일 - /var/tmp/mdas/10.1.31.65/Common/DataGenerator/ *.log 에 있는듯.
+   execute_data_generation 에서 만들고.
+   
+   local_repo = LocalRepoObjectAdapter(self.logger, MA_AUTO_RECOVERY_DATA)
+   LocalRepoObjectAdapter.py  147(함수포인트) 729 줄에 힌트 stage 와 params 로 bufferWaferLabel을 채움.
+   params 는 무엇이냐?
+   
+   def processData 와 연결 (LocalRepoObjectAdapter 에서 참조)
+   
+   실제로는 각 RepoAdapter.cc 에 registerToRepo_xxx 에 params[].v.str 로 접근
+
+    def _updateRepoObject_WACStatusLocationData(self, context, mid, params):
+        # check RepoObject valid state
+        if not self._isValidState(params, mid):
+            return
+        stage = self.getStage(context)
+        try:
+           if mid == 130036 :
+                label_ = str(params[1])
+                value_ = str(params[3])
+                if label_.startswith("WAC_Bf"):
+                    setattr(self.repo_object.get(stage), 'bufferWaferLabel_', label_)
+                    setattr(self.repo_object.get(stage), 'bufferWaferStatus_', value_)
+                elif label_.startswith("WAC_Lp"):
+                    setattr(self.repo_object.get(stage), 'carrierWaferLabel_', label_)
+                    setattr(self.repo_object.get(stage), 'carrierWaferStatus_', value_)
+                elif label_.startswith("WAC_SsBf"):
+                    setattr(self.repo_object.get(stage), 'ssBufferWaferLabel_', label_)
+                    setattr(self.repo_object.get(stage), 'ssBufferWaferStatus_', value_)
+                else:
+                    return 
+        except BaseException as e:
+                self.logger.error(f"mid={mid} {str(e)}")
+
+
+		== ErrorEventRepoAdapter ==
+		sno=392909807,sec=1738308880,usec=994933,sip=150.61.140.1,tid=1456,C(j=653,w=-1,r=-1,wil=-1,p=-1,s=-1,m=-1,jt=2,tt=-1,f=-1,lu=-1,pu=-1,u=-1,a=-1,pi=-1,stg=211)
+		2025/01/31 16:34:40.994933+0900, ERROR :400010:error_id:1000-19-0-270F cpu_name: j_title: e_title:End of main reset execution func_name: tlevel_id:-1 mlevel_id:-1 dmode_id:-1
+		 
+		 
+		== ExposureResultDataRepoAdapter ==
+		sno=1557973434,sec=1744614638,usec=4212,sip=150.61.150.1,tid=28426,C(j=0,w=1141,r=-1,wil=0,p=-1,s=-1,m=-1,jt=0,tt=-1,f=-1,lu=-1,pu=-1,u=-1,a=-1,pi=-1,stg=0)
+		2025/04/14 16:10:38.004212+0900, WFDC  :160004:WaferEnd: ImprintState:3
+
+4. 실제로는 각 RepoAdapter.cc 에 registerToRepo_xxx 에 params[].v.str 로 접근
+
+20251113
+
+1. JSON만듬. //LOG/mdas/output/TOOL1/Liplus 에 TOOLTest_ 이름으로 저장
+2. CTX 까지는 저장.
+3. ...RepoAdapter 부분은 생각을 해야함. 해결하기 쉬운 구조로 받아야 할듯.
+4. 우선 onmessage 차이점 부터 알아보자...
+5. mdas_collector 가 종료될때 json 마무리, 시간과 갯수 정해지면...
+6. DataRepo, WAC 와 TMV를 비교했을때 onMessage commom, A1 등은 같다고 보면 됨. clean_ common A1 등등도 같다고 보면됨. 
+   registerToRepo 는 msgID 부분 switch가 틀림 130036, 180151 오르 틀림. 
+   WAC 끼리는 같음. 
+   TMV registerToRepo 는 BCS, VCS 에 'v' 'b' 가 추가됨.
+7. WAC 와 TrueCauseErrorEvent 와 비교 
+   registerToRepo VCS 에서 switch 부분 다름. 
+8. 회의 - json 에 대해 이야기함.
+9. CommonRepoAdapter 만들어서 WAC, TMV 반응하게 진행.
+
+
+
+
+
