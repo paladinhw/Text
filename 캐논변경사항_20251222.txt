@@ -71,3 +71,17 @@ rpm -Uvh 와 rpm -ivh 로 설치함.
 그리고 tvision 에서 cmake.. 함. 그래도 안되었는데.
 export XTERM=termc 하면 실행은 됨.
 
+20251229
+- python 3.9 추가 <Python.h>
+- makefile 에 다음 추가해서 build ok
+	LX_LIBRARYS += -lpython3.9
+	LX_CXXINCLUDES_SBUS += -I/usr/include/python3.9
+
+20251230
+- Python 코드 추가 진행중
+   pjson json의 Code 에 "\n" 만 있는 경우에는 함수 들어오면서 fail 남. \n은 추후 붙혀 주는 것으로 
+   
+- C++ 안에 json 넣는 경우는 문제없이 잘됨. Json 파일 읽는 경우에는 여러가지 문제가 나타남. 우선 result 가 true가 안나옴.
+- template<typename T>
+   void CommonRepoAdapter::doFRunPythonScriptWithArguments(json& pjson, const vector<BasicData>& params, T& tresult) { 이 함수가 실행되기 전에 멈춘다. 좀 진행되다가 멈추기도 한다.
+   #19_13_1 이후에 멈춤.
