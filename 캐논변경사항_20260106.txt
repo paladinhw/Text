@@ -10,7 +10,7 @@
 20260108
 - initialize 에서 //if ( !m_autoRecoveryFlag )  를 셋팅하지 않으면
 	2026-01-08 11:13:03,115 (ThreadID:139781774235200) [INFO] [LogCollector.cc(1862)] /LOG/mdas/output/TOOL1/mdas_recovery/recovery_data/tsv : StartRoutine #0_4_2 create tsv file 
-	m_recoveryTSVDir /LOG/mdas/output/TOOL1/appended_data/recovery_tsv, m_recoveryTSVDirAppended oQ
+	m_recoveryTSVDir /LOG/mdas/output/TOOL1/appended_data/recovery_tsv, m_recoveryTSVDirAppended oQ  -> /LOG/mdas/output/TOOL1/appended_data/recovery_tsv
 
 	epc 에서 명령이 온후 받지 않고 mdas_collector 가 실행되는 경우.
 m_recoveryTSVDirAppended 이 setenv 가 아직 되지 않는 현상이 있어남. 이것은 m_recoveryTSVDir 을 읽을때 null 값이면 같이 셋팅하는 것으로 바꿔주면 되지 않을까
@@ -19,3 +19,27 @@ this_thread::sleep_for(chrono::milliseconds(500)); 사용했더니 m_recoveryTSV
 createTSVFile 파일에서 문제가 생기는 현상
 
 Delay 주는 문제는 프로그램이 죽는 문제 발생 - 다시 돌아감. m_recoveryTSVDirAppended 가 설정되어 있으면 문제가 사라지고 tsv 파일이 저장됨.
+
+
+20260116
+- 
+
+손수정
+
+substr
+
+자기자신을 불러온다.
+
+Json 만들어주기로 
+Log python 에서 찍는 것
+
+Event마다 json 파일의 이름과 출력 Pass Directory 변경도 가능하게..
+
+" - "
+
+- 메모리에 놓아두는 event 는 LotSeq 가 들어와서 JSon만들어지면 삭제 후보가 됨.
+- LotSeq 가 새로들어와 startid 들어오면 삭제.
+- 1일 지나면 무조건 삭제..... timer loop 돌아야 되네.  
+
+mdas_collector 를 기동시키는 Mode 가 있다고 onDemand (event중에 shot event 있는데 이것을 다른 Dir 저장함. (Liplus 아래 폴더에 저장) 
+- onDemandDir Json 에 추가할 듯.

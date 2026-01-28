@@ -1,0 +1,30 @@
+20260119
+- #16_1 에서도 멈춤. doFStartSaveJson 에도 mutex 적용. mtx1 적용.
+- 람다함수에도 mutex넣음.								sf1 = [&, sname, pdata]() {
+									std::lock_guard<std::mutex> lock(mtx1);
+									LOGREPO_INFO( logger, "SOPJ5 CommonRepoAdapter Treat Else rambda Json : #11_11 If Make rambda sname %s pdata %s", sname.c_str(), pdata.c_str());
+
+									jra[sname] = pdata.c_str(); //(params[iparam].v.str != nullptr)? params[iparam].v.str : ""; //null 인 경우 error
+									return true;
+								};
+								
+- createTSVFile mutex 추가
+- st54에서 부터 다시 시작.
+- WACStatusLocationData If handler 에 문제가 있는듯.
+
+
+20260121
+- TMValmatData 에서 strcat 등 처리 이상 jra[sname] 이 만들어 지지 않음. V1 V2 에서 strcat 이 만들어 져야 하는데 만들어 지지 않음. 확인요.
+- 2113 에  TMValmatData break 소스 일부 추가 에러일때 어떻게 하나 고민해야.
+
+- doFRegisterToRepo_MsgId -1 을 return 하면 -> 특별한 일이 안일어남. 그냥 return 과 같은 doFRegisterToRepo 로 감.
+
+
+20260127
+- nesstation 으로 가기 위해
+   timerCallback_newStation 만듬.
+  - json& jra = *(vcrd->mmOutJson[iStation]); 에 문제가 있었음.
+  
+  
+ 20260128
+- MakeFile 설명해줘. python 3.9

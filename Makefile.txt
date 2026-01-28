@@ -1,0 +1,409 @@
+
+#******************************************************************************
+# (c) Copyright CANON INC. 2019
+# File Name         : Makefile
+# Function          :
+# Last-modified     : 2019/04/24
+#******************************************************************************
+#---------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------
+# ディレクトリ定義
+#-----------------------------------------------------------------------------------
+BASEDIR         = ../../..
+RELDIR          = ${BASEDIR}/rel
+
+ifeq ("$(wildcard $(RELDIR))", "")
+RELDIR          = ${BASEDIR}/../../rel
+endif
+
+ROOTDIR         = $(BASEDIR)/dev
+DESTDIR         = $(ROOTDIR)/MediaCreate
+BINDESTDIR      = $(DESTDIR)/bin
+#sop added
+MODEL_TYPE		= TX_101
+
+
+ifeq ("$(wildcard $(RELDIR)/lusaka)", "")
+	LOG4D_INCLUDE_DIR = $(RELDIR)/chorus/export/include/log4d
+	LOG4D_LIB_DIR     = $(RELDIR)/chorus/console/linux/log4d/lib
+	DCDP_LIBS         = $(RELDIR)/dcdp/export/linux/libdcdprtl.a $(LOG4D_LIB_DIR)/liblog4d.a
+	DCDP_SLIBS_PATH   =
+	DCDP_SLIBS        =
+	LINK_DCDPLIB      = -lbrtl -lffi -lcpsutil -ldcdputil -lGenRuleCheck -ll2acc -ldcdp -ldcdpsl -ldcdprtl -lcontextinfo -llog4d
+else
+	LOG4D_INCLUDE_DIR = $(RELDIR)/lusaka/include/log4d
+	LOG4D_LIB_DIR     = $(RELDIR)/lusaka/lib
+	DCDP_LIBS         =
+	DCDP_SLIBS_PATH   = -L$(RELDIR)/dcdp/export/linux/ \
+	                    -L$(LOG4D_LIB_DIR)
+	DCDP_SLIBS        = -ldcdprtl -llog4d
+	LINK_DCDPLIB      = -lbrtl -lffi -lcpsutil -ldcdputil -lGenRuleCheck -ll2acc -ldcdp -ldcdpsl -ldcdprtl -lcontextinfo -llog4d -llctx
+endif
+
+
+LX_CONS_LIB_COMPATH_PATH     = -L$(LOG4D_LIB_DIR) \
+					-L${RELDIR}/dcdp/export/linux \
+					-L$(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/Repository/lib \
+					-L$(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector \
+					-L$(ROOTDIR)/CppCode/Common/lib \
+					-L$(ROOTDIR)/CppCode/Common/lib/64bit \
+					-L$(BINDESTDIR) \
+					-L/usr/local/lib/postgres_V8.4.22 \
+					-Wl,-rpath-link=${RELDIR}/dcdp/export/linux:$(LOG4D_LIB_DIR)
+
+
+
+#-----------------------------------------------------------------------------------
+# Define定義
+#-----------------------------------------------------------------------------------
+
+DEFINES         =
+
+LX_CXXDEFINES       = -DPTHREADS -DTHREAD -D_REENTRANT -D_THREAD_SAFE -D_CMA_NOWRAPPERS_ -D_FILE_OFFSET_BITS=64
+
+#-----------------------------------------------------------------------------------
+# コンパイルフラグ定義
+#-----------------------------------------------------------------------------------
+
+# DCDP インクルードパス指定
+LX_CONS_INCLUDE_COMPATH_PATH = -I${RELDIR}/dcdp/export/include \
+				-I${RELDIR}/dcdp/export/include/extra \
+				-I${RELDIR}/dcdp/export/include/libbrtl \
+				-I$(LOG4D_INCLUDE_DIR)
+
+LX_REPO_INCLUDE = -I$(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc \
+				-I$(ROOTDIR)/CppCode/Common/inc -I$(ROOTDIR)/CppCode/mdas_collector 
+# -I$(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/RepoAdapter
+
+LX_CXXINCLUDES_SBUS =  $(LX_CONS_INCLUDE_COMPATH_PATH) -I/usr/X11R6/include $(LX_REPO_INCLUDE)
+
+
+LX_CXXFLAGS_SBUS    =     -ext -O   -Wall   $(LX_CXXDEFINES) $(LX_CXXINCLUDES_SBUS) -DLINUX -DNO_ILAS -fpermissive
+LX_CFLAGS_SBUS =     -O  -Wall  $(DEFINES) $(LX_CXXINCLUDES_SBUS) -DLINUX
+
+
+LX_REPOLIB = -lRepoAdapter -lrepository -lclient_tcpio -ltcp_common_client -lrepoutil -llog4cpp
+
+
+LX_LIBRARYS     = -lm $(LINK_DCDPLIB) $(LX_REPOLIB) -lrt -lpthread
+
+LX_EXTRA =
+
+LX_LDFLAGS_SBUS = $(LX_CONS_LIB_COMPATH_PATH) -L/usr/lib64  $(LX_LIBRARYS) $(LX_EXTRA)
+
+#-----------------------------------------------------------------------------------
+# コマンド定義
+#-----------------------------------------------------------------------------------
+LIBRARY         = lib$(PACKAGE).a
+
+AR              = /usr/bin/ar
+STRIP           = /usr/bin/strip -d
+
+GCC             = /usr/bin/gcc
+GCXX            = /usr/bin/g++
+GLD             = /usr/bin/g++
+
+MAKE            = /usr/bin/make
+
+MKMF            = /usr/local/bin/mkmf
+MAKEFILE        = Makefile
+MAKE_FLAGS      = -f $(MAKEFILE) MACRO_FILE=$(MACRO_FILE)
+MKMF_FLAGS      = -f $(MAKEFILE)
+
+LX_MKMF         = /usr/local/bin/mkmf
+
+#---------------------------------------------------------------
+
+#---------------------------------------------------------------
+
+PROGRAM         = mdas_collector.exe
+PACKAGE         = RepoAdapter
+
+SRCS  = DcdpAutoRecovery.cc \
+		DcdpConnector.cc \
+		DcdpLogParseUtil.cc \
+		LogCollector.cc \
+		LoggerMdasCollector.cc \
+		MDASCollector.cc \
+		MDASDaemon.cc \
+		Timer.cc \
+		TimerCallback.cc \
+		CommonRepoAdapter.cc \
+		MdasInsertQueue.cpp
+
+OBJS  = DcdpAutoRecovery.o \
+		DcdpConnector.o \
+		DcdpLogParseUtil.o \
+		LogCollector.o \
+		LoggerMdasCollector.o \
+		MDASCollector.o \
+		MDASDaemon.o \
+		Timer.o \
+		TimerCallback.o \
+		CommonRepoAdapter.o \
+		MdasInsertQueue.o
+
+
+LX_PKG_LIBRARYS_SBUS = \
+       -lffi \
+       -lcpsutil \
+       -ldcdputil \
+       -lbrtl \
+       -lGenRuleCheck \
+       -ldcdp \
+       -lcontextinfo \
+       -ldcdprtl \
+       -ldcdpsl \
+       -lDebug
+
+LX_EXTRA =
+
+#---------------------------------------------------------------
+
+all: bin
+
+install: install-bin
+
+#---------------------------------------------------------------
+
+#******************************************************************************
+OBJS_ALL = $(OBJS) $(PROXY_OBJS)
+#******************************************************************************
+# end
+#******************************************************************************
+
+lib: $(LIBRARY)
+
+bin: $(PROGRAM)
+
+$(LIBRARY): $(OBJS_ALL)
+	@echo "Loading $(LIBRARY) ($(MODEL_TYPE))"
+	@rm -f $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(LIBRARY)
+	@echo "$(AR) cru $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(LIBRARY) $(OBJS_ALL)"
+	@$(AR) cru $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(LIBRARY) $(OBJS_ALL)
+
+$(PROGRAM): $(OBJS_ALL)
+	@echo "Linking $(PROGRAM) ($(MODEL_TYPE))"
+	@rm -f $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(PROGRAM)
+	@if [ "`uname`" = "Linux" ]; then \
+		echo "$(GLD) $(OBJS_ALL) $(LX_LDFLAGS_SBUS) -o $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(PROGRAM)" ;\
+		$(GLD) $(OBJS_ALL) $(LX_LDFLAGS_SBUS) -o $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(PROGRAM) ;\
+	else\
+		echo "Outside support";\
+	fi
+
+install-bin: bin
+
+clean clobber:
+	@echo "Cleaning"
+	@rm -f $(OBJS_ALL) a.out core *.o *.class *.jar *.gcno *.gcda *.gcov *~
+	@rm -f $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(LIBRARY)
+	@rm -f $(ROOTDIR)/MachineModel/$(MODEL_TYPE)/CppCode/mdas_collector/$(PROGRAM)
+
+depend_local:
+	@echo "update $(MAKEFILE)"
+	@if [ "`uname`" = "Linux" ]; then \
+		$(LX_MKMF) $(LX_CXXINCLUDES_SBUS) $(MKMF_FLAGS) SUFFIX="cc:sC++ cpp:sC++ hh:h hpp:h";\
+	else \
+		echo "Outside support";\
+	fi
+
+.SUFFIXES: .h .hh .hpp .c .cc .cpp .o
+
+.c.o:
+	@if [ "`uname`" = "Linux" ]; then \
+		echo "$(GCC) $(LX_CFLAGS_SBUS) -c $<" ;\
+		$(GCC) $(LX_CFLAGS_SBUS) -g -c $< -o $@ ;\
+	else\
+		echo "Outside support";\
+	fi
+
+.cc.o:
+	@if [ "`uname`" = "Linux" ]; then \
+		echo "$(GCXX) $(LX_CXXFLAGS_SBUS) -c $<" ;\
+		$(GCXX) $(LX_CXXFLAGS_SBUS) -g -c $< -o $@ ;\
+	else\
+		echo "Outside support";\
+	fi
+
+.cpp.o:
+	@if [ "`uname`" = "Linux" ]; then \
+		echo "$(GCXX) $(LX_CXXFLAGS_SBUS) -c $<" ;\
+		$(GCXX) $(LX_CXXFLAGS_SBUS) -g -c $< -o $@ ;\
+	else\
+		echo "Outside support";\
+	fi
+
+#---------------------------------------------------------------
+
+
+#---------------------------------------------------------------
+###
+DcdpAutoRecovery.o: DcdpAutoRecovery.hh LogCollector.hh BasicData.h \
+	../../../rel/dcdp/export/include/libbrtl/L0Msg.h \
+	../../../rel/dcdp/export/include/extra/ByteOrder.h \
+	../../../rel/dcdp/export/include/libbrtl/L0TimeId.h \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpecMap.h \
+	../../../rel/dcdp/export/include/extra/HashMap.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpec.h DcdpConnector.hh \
+	../../../rel/dcdp/export/include/dcdp.h \
+	../../../rel/dcdp/export/include/dcdp_def.h LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh
+DcdpConnector.o: DcdpConnector.hh ../../../rel/dcdp/export/include/dcdp.h \
+	../../../rel/dcdp/export/include/dcdp_def.h \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpecMap.h \
+	../../../rel/dcdp/export/include/extra/HashMap.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpec.h \
+	LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh \
+	RepoAdapter.hh BasicData.h Timer.hh \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_DcdpConnectionFailureEvent.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/RepositoryCommon.hpp
+DcdpLogParseUtil.o: DcdpLogParseUtil.hh
+LogCollector.o: LogCollector.hh BasicData.h \
+	../../../rel/dcdp/export/include/libbrtl/L0Msg.h \
+	../../../rel/dcdp/export/include/extra/ByteOrder.h \
+	../../../rel/dcdp/export/include/libbrtl/L0TimeId.h \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpecMap.h \
+	../../../rel/dcdp/export/include/extra/HashMap.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpec.h DcdpConnector.hh \
+	../../../rel/dcdp/export/include/dcdp.h \
+	../../../rel/dcdp/export/include/dcdp_def.h LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh RepoAdapter.hh \
+	Timer.hh DcdpAutoRecovery.hh MDASCollector.hh \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_DcdpConnectionFailureEvent.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/RepositoryCommon.hpp
+LoggerMdasCollector.o: LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh
+MDASCollector.o: MDASCollector.hh DcdpConnector.hh \
+	../../../rel/dcdp/export/include/dcdp.h \
+	../../../rel/dcdp/export/include/dcdp_def.h \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpecMap.h \
+	../../../rel/dcdp/export/include/extra/HashMap.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpec.h LogCollector.hh \
+	BasicData.h ../../../rel/dcdp/export/include/libbrtl/L0Msg.h \
+	../../../rel/dcdp/export/include/extra/ByteOrder.h \
+	../../../rel/dcdp/export/include/libbrtl/L0TimeId.h Timer.hh \
+	LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh RepoAdapter.hh \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_DcdpConnectionFailureEvent.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/RepositoryCommon.hpp \
+	DcdpAutoRecovery.hh DcdpLogParseUtil.hh
+MDASDaemon.o: MDASCollector.hh DcdpConnector.hh \
+	../../../rel/dcdp/export/include/dcdp.h \
+	../../../rel/dcdp/export/include/dcdp_def.h \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpecMap.h \
+	../../../rel/dcdp/export/include/extra/HashMap.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpec.h LogCollector.hh \
+	BasicData.h ../../../rel/dcdp/export/include/libbrtl/L0Msg.h \
+	../../../rel/dcdp/export/include/extra/ByteOrder.h \
+	../../../rel/dcdp/export/include/libbrtl/L0TimeId.h Timer.hh \
+	LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh RepoAdapter.hh \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_DcdpConnectionFailureEvent.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/RepositoryCommon.hpp \
+	DcdpAutoRecovery.hh
+Timer.o: Timer.hh LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh
+TimerCallback.o: \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_IncompleteObjSeq.hpp \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/RepositoryCommon.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_IncompleteObj.hpp \
+	RepoAdapter.hh BasicData.h Timer.hh LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh
+CommonRepoAdapter.o: \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_IncompleteObjSeq.hpp \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/RepositoryCommon.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/IF_IncompleteObj.hpp \
+	RepoAdapter.hh BasicData.h Timer.hh LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh
+MdasInsertQueue.o: LimitedQueue.hpp MdasInsertQueue.hpp \
+	../../../dev/MachineModel/$(MODEL_TYPE)/CppCode/Repository/inc/BaseClasses.hpp \
+	../../../rel/dcdp/export/include/libbrtl/L0Msg.h \
+	../../../rel/dcdp/export/include/extra/ByteOrder.h \
+	../../../rel/dcdp/export/include/libbrtl/L0TimeId.h \
+	../../../rel/dcdp/export/include/contextinfo.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpecMap.h \
+	../../../rel/dcdp/export/include/extra/HashMap.h \
+	../../../rel/dcdp/export/include/libbrtl/L0MsgSpec.h DcdpConnector.hh \
+	../../../rel/dcdp/export/include/dcdp.h \
+	../../../rel/dcdp/export/include/dcdp_def.h LoggerMdasCollector.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Category.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Appender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/RollingFileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/FileAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/OstreamAppender.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Layout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/PatternLayout.hh \
+	../../../dev/CppCode/Common/inc/log4cpp/Priority.hh RepoAdapter.hh
